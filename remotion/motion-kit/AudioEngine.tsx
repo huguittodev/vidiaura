@@ -17,7 +17,12 @@ import {
   staticFile,
   useVideoConfig,
 } from 'remotion';
-import type { AudioAsset, AudioCue } from '../../src/lib/scene-graph/types';
+import type {
+  AudioAsset,
+  AudioCue,
+  BeatGridConfig,
+  SceneNode,
+} from '../../src/lib/scene-graph/types';
 import {
   calculateFadeGain,
   type FadeConfig,
@@ -37,6 +42,7 @@ import {
 export * from './audio/FadeController';
 export * from './audio/AudioMixer';
 export * from './audio/AudioTimeline';
+export * from './audio/BeatGrid';
 
 export interface SoundCue {
   frame: number;
@@ -54,6 +60,10 @@ export interface BackgroundMusicConfig {
 export interface AudioEngineProps {
   // SceneGraph declarative audio track (Milestones 2 & 3)
   audioTrack?: AudioCue[];
+
+  // SceneGraph v3 event-driven Auto-SFX & BeatGrid
+  scenes?: SceneNode[];
+  beatGrid?: BeatGridConfig;
 
   // Legacy backwards-compatible props (StudioShowcase)
   soundCues?: SoundCue[];
@@ -76,6 +86,8 @@ function resolveStaticSrc(path: string): string {
 
 export const AudioEngine: React.FC<AudioEngineProps> = ({
   audioTrack,
+  scenes,
+  beatGrid,
   soundCues = [],
   music,
   enabled = true,
@@ -85,9 +97,11 @@ export const AudioEngine: React.FC<AudioEngineProps> = ({
 
   // Build unified audio timeline
   const timeline: AudioTimeline = React.useMemo(() => {
-    if (audioTrack && audioTrack.length > 0) {
+    if ((audioTrack && audioTrack.length > 0) || (scenes && scenes.length > 0)) {
       return buildAudioTimeline({
-        audioTrack,
+        audioTrack: audioTrack ?? [],
+        scenes,
+        beatGrid,
         durationInFrames,
         fps,
       });
@@ -125,10 +139,12 @@ export const AudioEngine: React.FC<AudioEngineProps> = ({
 
     return buildAudioTimeline({
       audioTrack: syntheticCues,
+      scenes,
+      beatGrid,
       durationInFrames,
       fps,
     });
-  }, [audioTrack, soundCues, music, durationInFrames, fps]);
+  }, [audioTrack, scenes, beatGrid, soundCues, music, durationInFrames, fps]);
 
   if (!enabled) return null;
 

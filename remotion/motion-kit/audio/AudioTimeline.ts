@@ -5,7 +5,12 @@
  * and procedural sound scheduling (keystroke cycling, click alternation, scene transition whooshes).
  */
 
-import type { AudioAsset, AudioCue } from '../../../src/lib/scene-graph/types';
+import type {
+  AudioAsset,
+  AudioCue,
+  BeatGridConfig,
+  SceneNode,
+} from '../../../src/lib/scene-graph/types';
 
 export interface AssetProfile {
   asset: AudioAsset;
@@ -15,6 +20,8 @@ export interface AssetProfile {
   isMusic: boolean;
   duckingPriority: number; // 0 = background, 1 = subtle (no ducking), 2 = energetic (triggers sidechain ducking)
   nominalVolume: number;
+  /** Shotcraft Rule S5: Acoustic sample peak lag in frames at 30fps so peak aligns with visual apex. */
+  samplePeakLagFrames?: number;
 }
 
 /**
@@ -40,6 +47,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 2,
     nominalVolume: 0.65,
+    samplePeakLagFrames: 3,
   },
   'chime': {
     asset: 'chime',
@@ -49,6 +57,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 2,
     nominalVolume: 0.75,
+    samplePeakLagFrames: 1,
   },
   'keyboard-tap': {
     asset: 'keyboard-tap',
@@ -58,6 +67,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.50,
+    samplePeakLagFrames: 0,
   },
   'mouse-click': {
     asset: 'mouse-click',
@@ -67,6 +77,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.85,
+    samplePeakLagFrames: 0,
   },
   'soft-pop': {
     asset: 'soft-pop',
@@ -76,6 +87,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.65,
+    samplePeakLagFrames: 1,
   },
 
   // --- Expanded 12-Piece SaaS SFX Bank (Base44 Cinematic Direction) ---
@@ -87,6 +99,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 2,
     nominalVolume: 0.70,
+    samplePeakLagFrames: 4,
   },
   'transition-whoosh-fast': {
     asset: 'transition-whoosh-fast',
@@ -96,6 +109,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 2,
     nominalVolume: 0.65,
+    samplePeakLagFrames: 2,
   },
   'sound-riser': {
     asset: 'sound-riser',
@@ -105,6 +119,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 2,
     nominalVolume: 0.60,
+    samplePeakLagFrames: 18,
   },
   'sub-bass-drop': {
     asset: 'sub-bass-drop',
@@ -114,6 +129,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 2,
     nominalVolume: 0.75,
+    samplePeakLagFrames: 1,
   },
   'click-switch': {
     asset: 'click-switch',
@@ -123,6 +139,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.80,
+    samplePeakLagFrames: 0,
   },
   'click-soft': {
     asset: 'click-soft',
@@ -132,6 +149,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.60,
+    samplePeakLagFrames: 0,
   },
   'mechanical-tap-1': {
     asset: 'mechanical-tap-1',
@@ -141,6 +159,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.45,
+    samplePeakLagFrames: 0,
   },
   'mechanical-tap-2': {
     asset: 'mechanical-tap-2',
@@ -150,6 +169,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.45,
+    samplePeakLagFrames: 0,
   },
   'mechanical-tap-3': {
     asset: 'mechanical-tap-3',
@@ -159,6 +179,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.45,
+    samplePeakLagFrames: 0,
   },
   'mechanical-tap-4': {
     asset: 'mechanical-tap-4',
@@ -168,6 +189,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.45,
+    samplePeakLagFrames: 0,
   },
   'pop-clean': {
     asset: 'pop-clean',
@@ -177,6 +199,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 1,
     nominalVolume: 0.65,
+    samplePeakLagFrames: 1,
   },
   'success-chime': {
     asset: 'success-chime',
@@ -186,6 +209,7 @@ export const SFX_CATALOG: Record<AudioAsset, AssetProfile> = {
     isMusic: false,
     duckingPriority: 2,
     nominalVolume: 0.70,
+    samplePeakLagFrames: 1,
   },
 };
 
@@ -331,6 +355,214 @@ export function scheduleSceneTransitionWhooshes(params: {
 }
 
 /* ========================================================================= */
+/* Shotcraft Rules S2 & S5: Offset Compensation & Anti-Machine-Gun Auto-SFX   */
+/* ========================================================================= */
+
+/**
+ * Shotcraft Rule S5: Dual Audio Offset Compensation.
+ * Computes the exact start frame for an SFX cue so its acoustic envelope peak
+ * lands on `targetPeakFrame`, compensating for both the sample's internal
+ * attack lag (`samplePeakLagFrames`) and the pipeline output offset (`outputPipelineOffsetFrames`).
+ */
+export function sfxFrom(
+  targetPeakFrame: number,
+  asset: AudioAsset,
+  outputPipelineOffsetFrames: number = 0
+): number {
+  const sampleLag = SFX_CATALOG[asset]?.samplePeakLagFrames ?? 0;
+  return Math.max(
+    0,
+    Math.round(targetPeakFrame - sampleLag - outputPipelineOffsetFrames)
+  );
+}
+
+/**
+ * Shotcraft Rule S2: Anti-Machine-Gun Rapid-Fire Volume Step-Down Ladder.
+ * Starts at 0.40 and steps down to 0.25 across rapid consecutive entrances.
+ */
+export const RAPID_FIRE_VOLUME_LADDER: readonly number[] = [
+  0.40,
+  0.34,
+  0.29,
+  0.25,
+] as const;
+
+export const RAPID_FIRE_SAMPLE_POOL: readonly AudioAsset[] = [
+  'click-soft',
+  'pop-clean',
+  'mechanical-tap-1',
+  'mechanical-tap-2',
+  'click-switch',
+  'mechanical-tap-3',
+] as const;
+
+/**
+ * Schedules a rapid-fire batch entrance burst (Rule S2):
+ * - Alternates across distinct samples so no identical sample repeats back-to-back.
+ * - Steps down volume from 0.40 -> 0.34 -> 0.29 -> 0.25 to prevent acoustic fatigue.
+ */
+export function scheduleRapidFireBurst(params: {
+  startFrame: number;
+  count: number;
+  intervalFrames?: number;
+  outputPipelineOffsetFrames?: number;
+  idPrefix?: string;
+}): AudioCue[] {
+  const {
+    startFrame,
+    count,
+    intervalFrames = 3,
+    outputPipelineOffsetFrames = 0,
+    idPrefix = 'burst',
+  } = params;
+  const safeCount = Math.max(0, Math.min(16, Math.floor(count)));
+  const step = Math.max(1, Math.floor(intervalFrames));
+  const cues: AudioCue[] = [];
+
+  for (let i = 0; i < safeCount; i++) {
+    const asset = RAPID_FIRE_SAMPLE_POOL[i % RAPID_FIRE_SAMPLE_POOL.length];
+    const volume =
+      RAPID_FIRE_VOLUME_LADDER[
+        Math.min(i, RAPID_FIRE_VOLUME_LADDER.length - 1)
+      ];
+    const targetFrame = startFrame + i * step;
+    const frame = sfxFrom(targetFrame, asset, outputPipelineOffsetFrames);
+    cues.push({
+      id: `${idPrefix}-${i}-${frame}`,
+      frame,
+      asset,
+      volume,
+    });
+  }
+
+  return cues;
+}
+
+/**
+ * Compiles declarative `SceneNode` v3 `autoSfxEvents` and `transitionOut` seam transitions
+ * into frame-accurate `AudioCue[]` with Rule S5 `sfxFrom` offset compensation and Rule S2
+ * rapid-fire volume step-down.
+ */
+export function compileSceneAutoSfx(params: {
+  scenes: SceneNode[];
+  beatGrid?: BeatGridConfig;
+  durationInFrames: number;
+}): AudioCue[] {
+  const { scenes, beatGrid, durationInFrames } = params;
+  const outputOffset = beatGrid?.outputAudioOffsetFrames ?? 0;
+  const compiled: AudioCue[] = [];
+
+  for (const scene of scenes) {
+    // 1. Scene-level declarative soundCues
+    if (scene.soundCues) {
+      for (const cue of scene.soundCues) {
+        const absFrame = cue.frame < scene.startFrame ? scene.startFrame + cue.frame : cue.frame;
+        if (absFrame < durationInFrames) {
+          compiled.push({
+            ...cue,
+            id: `scene-cue-${scene.id}-${cue.id}`,
+            frame: absFrame,
+          });
+        }
+      }
+    }
+
+    // 2. Event-driven Auto-SFX (Layer 5)
+    if (scene.autoSfxEvents) {
+      for (const ev of scene.autoSfxEvents) {
+        const targetPeak = scene.startFrame + ev.frame;
+        if (targetPeak >= durationInFrames) continue;
+
+        if (ev.event === 'rapid-batch-tick' || (ev.burstCount && ev.burstCount > 1)) {
+          const burst = scheduleRapidFireBurst({
+            startFrame: targetPeak,
+            count: ev.burstCount ?? 4,
+            intervalFrames: ev.burstIntervalFrames ?? 3,
+            outputPipelineOffsetFrames: outputOffset,
+            idPrefix: `autosfx-${scene.id}-${ev.id}`,
+          });
+          compiled.push(...burst.filter((b) => b.frame < durationInFrames));
+          continue;
+        }
+
+        let asset: AudioAsset = 'soft-pop';
+        let defaultVol = 0.65;
+        switch (ev.event) {
+          case 'hero-slam':
+            asset = 'sub-bass-drop';
+            defaultVol = 0.75;
+            break;
+          case 'ui-card-pop':
+            asset = 'pop-clean';
+            defaultVol = 0.60;
+            break;
+          case 'spotlight-whoosh':
+            asset = 'camera-whoosh';
+            defaultVol = 0.58;
+            break;
+          case 'sheen-shimmer':
+            asset = 'chime';
+            defaultVol = 0.52;
+            break;
+          case 'metric-roll':
+            asset = 'click-switch';
+            defaultVol = 0.55;
+            break;
+          case 'cta-chime':
+            asset = 'success-chime';
+            defaultVol = 0.72;
+            break;
+          case 'whip-transition':
+            asset = 'transition-whoosh-fast';
+            defaultVol = 0.65;
+            break;
+          default:
+            asset = 'soft-pop';
+            defaultVol = 0.60;
+            break;
+        }
+
+        const compensatedFrame = sfxFrom(targetPeak, asset, outputOffset);
+        compiled.push({
+          id: `autosfx-${scene.id}-${ev.id}-${compensatedFrame}`,
+          frame: compensatedFrame,
+          asset,
+          volume: ev.volume ?? defaultVol,
+        });
+      }
+    }
+
+    // 3. Seam Transition Out Auto-SFX
+    if (scene.transitionOut && scene.transitionOut.type !== 'hard-cut') {
+      const seamFrame = scene.startFrame + scene.durationInFrames;
+      if (seamFrame <= durationInFrames) {
+        const transAsset: AudioAsset =
+          scene.transitionOut.type === 'flash-cut'
+            ? 'sub-bass-drop'
+            : scene.transitionOut.type === 'portal-zoom-wipe'
+              ? 'transition-whoosh-heavy'
+              : 'transition-whoosh-fast';
+        const transFrame = sfxFrom(
+          Math.max(0, seamFrame - 2),
+          transAsset,
+          outputOffset
+        );
+        if (transFrame < durationInFrames) {
+          compiled.push({
+            id: `autosfx-seam-${scene.id}-${scene.transitionOut.type}-${transFrame}`,
+            frame: transFrame,
+            asset: transAsset,
+            volume: SFX_CATALOG[transAsset].nominalVolume,
+          });
+        }
+      }
+    }
+  }
+
+  return compiled;
+}
+
+/* ========================================================================= */
 /* Audio Timeline Assembly & Scheduling Engine                              */
 /* ========================================================================= */
 
@@ -361,11 +593,14 @@ export interface BuildAudioTimelineParams {
   durationInFrames: number;
   fps?: number;
   procedural?: ProceduralAudioOptions;
+  scenes?: SceneNode[];
+  beatGrid?: BeatGridConfig;
 }
 
 /**
  * Builds a deterministic chronological AudioTimeline from SceneGraph audioTrack,
- * with optional procedural audio enhancement (keystroke cycling, click alternation, scene whooshes).
+ * with optional procedural audio enhancement (keystroke cycling, click alternation, scene whooshes)
+ * and SceneGraph v3 event-driven Auto-SFX compilation.
  */
 export function buildAudioTimeline(params: BuildAudioTimelineParams): AudioTimeline {
   const fps = params.fps ?? 30;
@@ -374,6 +609,15 @@ export function buildAudioTimeline(params: BuildAudioTimelineParams): AudioTimel
 
   // Process raw cues through procedural pipeline if requested
   let workingTrack = [...params.audioTrack];
+
+  if (params.scenes && params.scenes.length > 0) {
+    const autoCues = compileSceneAutoSfx({
+      scenes: params.scenes,
+      beatGrid: params.beatGrid,
+      durationInFrames,
+    });
+    workingTrack.push(...autoCues);
+  }
 
   if (procedural?.enableKeystrokeCycling) {
     let tapCounter = 0;

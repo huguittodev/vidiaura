@@ -15,11 +15,35 @@ export type MotionArchetype =
 export type BackdropVariant = 'dark-precision' | 'light-editorial' | 'aurora-blur' | 'solid';
 export type SurfaceTheme = 'light' | 'dark';
 
+export type StageLook =
+  | 'obsidian'
+  | 'dark-precision'
+  | 'light-editorial'
+  | 'studio-light'
+  | 'aurora-blur';
+
+export interface StageKeyLight {
+  x: number;
+  y: number;
+}
+
+export interface StageLayerConfig {
+  look?: StageLook;
+  grainOpacity?: number;
+  vignetteStrength?: number;
+  dustParticles?: boolean;
+  gridFloor?: boolean;
+  horizon?: number;
+  keyLight?: StageKeyLight;
+  backdropVideoUrl?: string;
+}
+
 export interface ArtDirection {
   backdropVariant: BackdropVariant;
   surfaceTheme: SurfaceTheme;
   primaryAccent: string; // Hex color string (#RGB or #RRGGBB)
   archetype?: MotionArchetype;
+  stage?: StageLayerConfig;
 }
 
 /**
@@ -208,6 +232,141 @@ export interface SaaSFeatureGridPayload {
   staggerFrames?: number;
 }
 
+/* ========================================================================= */
+/* Layers 2–5: Composable Shot Descriptors (SceneGraph v3)                   */
+/* ========================================================================= */
+
+export type LayoutPresetName =
+  | 'hook'
+  | 'stage'
+  | 'split'
+  | 'bento'
+  | 'lower-third'
+  | 'pair';
+
+export interface PageCamKey {
+  frame: number;
+  cx: number;
+  cy: number;
+  zoom: number;
+  rotX?: number;
+  rotY?: number;
+  rotZ?: number;
+  persp?: number;
+}
+
+export type CameraRecipeMode =
+  | 'track'
+  | 'page-cam-2.5d'
+  | 'dolly-push-in'
+  | 'isometric-tilt-reveal'
+  | 'orbit-drift'
+  | 'whip-pan';
+
+export interface CameraDofConfig {
+  focusY: number;
+  strength: number;
+}
+
+export interface CameraRecipeConfig {
+  mode: CameraRecipeMode;
+  keys?: PageCamKey[];
+  dof?: CameraDofConfig;
+}
+
+export interface CropCallout {
+  id: string;
+  label: string;
+  sublabel?: string;
+  metricValue?: string;
+  badge?: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  elevationZ?: number;
+  enterFrame?: number;
+  accentColor?: string;
+}
+
+export interface SpotlightModifier {
+  enabled: boolean;
+  fromX: number;
+  fromY: number;
+  toX?: number;
+  toY?: number;
+  radius?: number;
+  dimOpacity?: number;
+  startFrame?: number;
+  durationInFrames?: number;
+}
+
+export interface SheenModifier {
+  enabled: boolean;
+  startFrame?: number;
+  durationInFrames?: number;
+  angle?: number;
+  strength?: number;
+}
+
+export interface SpeedBlurModifier {
+  enabled: boolean;
+  vx: number;
+  vy?: number;
+  startFrame: number;
+  durationInFrames: number;
+}
+
+export interface CaptionBarModifier {
+  index: string;
+  text: string;
+  appearAt?: number;
+}
+
+export interface SceneModifiers {
+  spotlight?: SpotlightModifier;
+  sheen?: SheenModifier;
+  speedBlur?: SpeedBlurModifier;
+  captionBar?: CaptionBarModifier;
+}
+
+export type TransitionType =
+  | 'hard-cut'
+  | 'flash-cut'
+  | 'whip-pan-brake'
+  | 'portal-zoom-wipe';
+
+export interface SceneTransition {
+  type: TransitionType;
+  durationInFrames?: number;
+}
+
+export type AutoSfxEventType =
+  | 'hero-slam'
+  | 'ui-card-pop'
+  | 'rapid-batch-tick'
+  | 'spotlight-whoosh'
+  | 'sheen-shimmer'
+  | 'metric-roll'
+  | 'cta-chime'
+  | 'whip-transition';
+
+export interface AutoSfxEvent {
+  id: string;
+  event: AutoSfxEventType;
+  frame: number;
+  volume?: number;
+  burstCount?: number;
+  burstIntervalFrames?: number;
+}
+
+export interface BeatGridConfig {
+  bpm: number;
+  beat0Seconds?: number;
+  beatsPerBar?: number;
+  outputAudioOffsetFrames?: number;
+}
+
 /* Base Scene Node */
 export interface BaseSceneNode {
   id: string;
@@ -215,6 +374,13 @@ export interface BaseSceneNode {
   fromFrame?: number;
   durationInFrames: number;
   soundCues?: AudioCue[];
+  stageOverride?: StageLayerConfig;
+  layoutPreset?: LayoutPresetName;
+  cameraRecipe?: CameraRecipeConfig;
+  cropCallouts?: CropCallout[];
+  modifiers?: SceneModifiers;
+  transitionOut?: SceneTransition;
+  autoSfxEvents?: AutoSfxEvent[];
 }
 
 export interface KineticTypographySceneNode extends BaseSceneNode {
@@ -294,15 +460,18 @@ export type SceneNode =
   | ConversationalMockupSceneNode
   | SaaSFeatureGridSceneNode;
 
+export type SceneGraphVersion = '2.0' | '3.0';
+
 /**
  * Root SceneGraph contract driving Remotion composition rendering.
  */
 export interface SceneGraph {
-  version: '2.0';
+  version: SceneGraphVersion;
   canvas: CanvasConfig;
   artDirection: ArtDirection;
   cameraTrack: CameraKeyframe[];
   cursorTrack: CursorKeyframe[];
   audioTrack: AudioCue[];
   scenes: SceneNode[];
+  beatGrid?: BeatGridConfig;
 }

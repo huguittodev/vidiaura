@@ -38,6 +38,8 @@ import {
   MetricCardsShowcase,
   ConversationalMockup,
   SaaSFeatureGrid,
+  ShotcraftSceneComposer,
+  StageAtmosphereLayer,
   type TreeNode,
 } from '../motion-kit';
 
@@ -1237,7 +1239,7 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
           archetype === 'linear-dark' || isDark ? '#0D0D10' : '#F5F2EB',
       }}
     >
-      {/* 1. Outer Layer: Dynamic Studio Backdrop */}
+      {/* 1. Outer Layer: Dynamic Studio Backdrop + Layer 1 Stage Atmosphere */}
       <DynamicBackdrop
         frame={frame}
         variant={sceneGraph.artDirection.backdropVariant}
@@ -1251,6 +1253,13 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
             : undefined
         }
         dotGrid={true}
+      />
+      <StageAtmosphereLayer
+        stage={sceneGraph.artDirection.stage}
+        isDark={isDark}
+        accentColor={accent}
+        canvas={sceneGraph.canvas}
+        frame={frame}
       />
 
       {/* 2. Middle Layer: Zero-Drift 3D Camera Rig with RealCaptureSurface */}
@@ -1296,16 +1305,25 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
               durationInFrames={node.durationInFrames}
               name={node.type}
             >
-              <SceneNodeRenderer
+              <ShotcraftSceneComposer
                 node={node}
                 artDirection={{
                   ...sceneGraph.artDirection,
                   archetype,
                 }}
                 canvas={sceneGraph.canvas}
-                sceneGraph={sceneGraph}
-                globalFrame={frame}
-              />
+              >
+                <SceneNodeRenderer
+                  node={node}
+                  artDirection={{
+                    ...sceneGraph.artDirection,
+                    archetype,
+                  }}
+                  canvas={sceneGraph.canvas}
+                  sceneGraph={sceneGraph}
+                  globalFrame={frame}
+                />
+              </ShotcraftSceneComposer>
             </Sequence>
           ))
         ) : (
@@ -1348,8 +1366,12 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
       </CameraRig>
 
 
-      {/* 4. Audio Layer: Frame-Accurate SFX, Headroom Limiter, & Sidechain Ducking */}
-      <AudioEngine audioTrack={sceneGraph.audioTrack} />
+      {/* 4. Audio Layer: Frame-Accurate SFX, Auto-SFX (v3), Headroom Limiter, & Sidechain Ducking */}
+      <AudioEngine
+        audioTrack={sceneGraph.audioTrack}
+        scenes={sceneGraph.scenes}
+        beatGrid={sceneGraph.beatGrid}
+      />
     </div>
   );
 };

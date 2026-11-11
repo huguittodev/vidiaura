@@ -12,6 +12,7 @@
 
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import {
@@ -262,6 +263,13 @@ describe('Empirical Adversarial Verification: Milestone 2 Dual Aspect Ratio & Ca
   describe('3. Remotion Vertical Composition Render File Inspection', () => {
     it('verifies generated vertical still frame exists and has valid 1080x1920 PNG format', () => {
       const stillPath = path.resolve(process.cwd(), 'out/test-vertical-challenger.png');
+      if (!fs.existsSync(stillPath)) {
+        fs.mkdirSync(path.dirname(stillPath), { recursive: true });
+        execSync(
+          './node_modules/.bin/remotion still remotion/index.ts InteractiveSurfaceDemo-Vertical out/test-vertical-challenger.png --frame=90',
+          { stdio: 'pipe' }
+        );
+      }
       assert.ok(fs.existsSync(stillPath), `Still file ${stillPath} must exist`);
 
       const stats = fs.statSync(stillPath);

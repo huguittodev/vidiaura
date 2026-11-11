@@ -16,3 +16,7 @@ export * from './MediaShowcase';
 export * from './MetricCardsShowcase';
 export * from './ConversationalMockup';
 export * from './SaaSFeatureGrid';
+export * from './Polish';
+export * from './PageCam25D';
+export * from './SpotlightSweep';
+export * from './ShotcraftSceneComposer';

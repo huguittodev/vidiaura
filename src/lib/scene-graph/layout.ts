@@ -223,7 +223,7 @@ export function resolveSceneLayout(
   scene: SceneNode,
   canvas: CanvasConfig
 ): SceneLayout {
-  const preset = SCENE_LAYOUT_PRESETS[scene.type];
+  const preset = scene.layoutPreset ?? SCENE_LAYOUT_PRESETS[scene.type];
   if (!preset) {
     throw new Error(`No layout preset registered for scene type "${scene.type}"`);
   }

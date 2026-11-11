@@ -24,6 +24,34 @@ export type MotionArchetypeParsed = z.infer<typeof MotionArchetypeSchema>;
 
 export const SurfaceThemeSchema = z.enum(['light', 'dark']);
 
+/* ========================================================================= */
+/* Layer 1: Stage & Backdrop Atom (SceneGraph v3)                            */
+/* ========================================================================= */
+
+export const StageLookSchema = z.enum([
+  'obsidian',
+  'dark-precision',
+  'light-editorial',
+  'studio-light',
+  'aurora-blur',
+]);
+
+export const StageKeyLightSchema = z.object({
+  x: z.number().min(0.0).max(1.0),
+  y: z.number().min(0.0).max(1.0),
+});
+
+export const StageLayerConfigSchema = z.object({
+  look: StageLookSchema.optional(),
+  grainOpacity: z.number().min(0.0).max(0.25).optional(),
+  vignetteStrength: z.number().min(0.0).max(0.85).optional(),
+  dustParticles: z.boolean().optional(),
+  gridFloor: z.boolean().optional(),
+  horizon: z.number().min(0.2).max(0.9).optional(),
+  keyLight: StageKeyLightSchema.optional(),
+  backdropVideoUrl: z.string().optional(),
+});
+
 export const ArtDirectionSchema = z.object({
   backdropVariant: BackdropVariantSchema,
   surfaceTheme: SurfaceThemeSchema,
@@ -31,6 +59,7 @@ export const ArtDirectionSchema = z.object({
     .string()
     .regex(HexColorRegex, { message: 'primaryAccent must be a valid hex color code (#RGB or #RRGGBB)' }),
   archetype: MotionArchetypeSchema.optional(),
+  stage: StageLayerConfigSchema.optional(),
 });
 
 export const CanvasConfigSchema = z.object({
@@ -208,12 +237,163 @@ export const SaaSFeatureGridPayloadSchema = z.object({
   staggerFrames: z.number().int().min(1).max(30).optional(),
 });
 
+/* ========================================================================= */
+/* Layers 2–5: Composable Shot Descriptors (SceneGraph v3)                   */
+/* ========================================================================= */
+
+export const LayoutPresetIdSchema = z.enum([
+  'hook',
+  'stage',
+  'split',
+  'bento',
+  'lower-third',
+  'pair',
+]);
+
+export const PageCamKeySchema = z.object({
+  frame: z.number().int().nonnegative(),
+  cx: z.number(),
+  cy: z.number(),
+  zoom: z.number().min(0.5).max(4.0),
+  rotX: z.number().min(-60).max(60).optional(),
+  rotY: z.number().min(-60).max(60).optional(),
+  rotZ: z.number().min(-90).max(90).optional(),
+  persp: z.number().min(400).max(4000).optional(),
+});
+
+export const CameraRecipeModeSchema = z.enum([
+  'track',
+  'page-cam-2.5d',
+  'dolly-push-in',
+  'isometric-tilt-reveal',
+  'orbit-drift',
+  'whip-pan',
+]);
+
+export const CameraDofConfigSchema = z.object({
+  focusY: z.number().min(0).max(1920),
+  strength: z.number().min(0).max(24),
+});
+
+export const CameraRecipeConfigSchema = z.object({
+  mode: CameraRecipeModeSchema,
+  keys: z.array(PageCamKeySchema).optional(),
+  dof: CameraDofConfigSchema.optional(),
+});
+
+export const CropCalloutSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1).max(80),
+  sublabel: z.string().max(100).optional(),
+  metricValue: z.string().max(24).optional(),
+  badge: z.string().max(30).optional(),
+  x: z.number().min(0.0).max(1.0),
+  y: z.number().min(0.0).max(1.0),
+  width: z.number().int().min(120).max(720).optional(),
+  height: z.number().int().min(60).max(400).optional(),
+  elevationZ: z.number().min(10).max(220).optional(),
+  enterFrame: z.number().int().nonnegative().optional(),
+  accentColor: z.string().regex(HexColorRegex).optional(),
+});
+
+export const SpotlightModifierSchema = z.object({
+  enabled: z.boolean(),
+  fromX: z.number().min(0.0).max(1.0),
+  fromY: z.number().min(0.0).max(1.0),
+  toX: z.number().min(0.0).max(1.0).optional(),
+  toY: z.number().min(0.0).max(1.0).optional(),
+  radius: z.number().min(80).max(900).optional(),
+  dimOpacity: z.number().min(0.0).max(0.9).optional(),
+  startFrame: z.number().int().nonnegative().optional(),
+  durationInFrames: z.number().int().positive().optional(),
+});
+
+export const SheenModifierSchema = z.object({
+  enabled: z.boolean(),
+  startFrame: z.number().int().nonnegative().optional(),
+  durationInFrames: z.number().int().positive().optional(),
+  angle: z.number().min(-45).max(45).optional(),
+  strength: z.number().min(0.05).max(0.8).optional(),
+});
+
+export const SpeedBlurModifierSchema = z.object({
+  enabled: z.boolean(),
+  vx: z.number().min(-120).max(120),
+  vy: z.number().min(-120).max(120).optional(),
+  startFrame: z.number().int().nonnegative(),
+  durationInFrames: z.number().int().positive(),
+});
+
+export const CaptionBarModifierSchema = z.object({
+  index: z.string().min(1).max(32),
+  text: z.string().min(1).max(100),
+  appearAt: z.number().int().nonnegative().optional(),
+});
+
+export const SceneModifiersSchema = z.object({
+  spotlight: SpotlightModifierSchema.optional(),
+  sheen: SheenModifierSchema.optional(),
+  speedBlur: SpeedBlurModifierSchema.optional(),
+  captionBar: CaptionBarModifierSchema.optional(),
+});
+
+export const TransitionTypeSchema = z.enum([
+  'hard-cut',
+  'flash-cut',
+  'whip-pan-brake',
+  'portal-zoom-wipe',
+]);
+
+export const SceneTransitionSchema = z.object({
+  type: TransitionTypeSchema,
+  durationInFrames: z.number().int().min(4).max(30).optional(),
+});
+
+export const AutoSfxEventTypeSchema = z.enum([
+  'hero-slam',
+  'ui-card-pop',
+  'rapid-batch-tick',
+  'spotlight-whoosh',
+  'sheen-shimmer',
+  'metric-roll',
+  'cta-chime',
+  'whip-transition',
+]);
+
+export const AutoSfxEventSchema = z.object({
+  id: z.string().min(1),
+  event: AutoSfxEventTypeSchema,
+  frame: z.number().int().nonnegative(),
+  volume: z.number().min(0.0).max(1.0).optional(),
+  burstCount: z.number().int().min(1).max(16).optional(),
+  burstIntervalFrames: z.number().int().min(1).max(12).optional(),
+});
+
+export const BeatGridConfigSchema = z.object({
+  bpm: z.number().min(60).max(200),
+  beat0Seconds: z.number().min(0).max(10).optional(),
+  beatsPerBar: z.number().int().min(2).max(8).optional(),
+  outputAudioOffsetFrames: z.number().int().min(-15).max(15).optional(),
+});
+
 const baseSceneFields = {
   id: z.string().min(1),
   startFrame: z.number().int().nonnegative(),
   fromFrame: z.number().int().nonnegative().optional(),
   durationInFrames: z.number().int().positive(),
   soundCues: z.array(AudioCueSchema).optional(),
+  // Layer 1 override
+  stageOverride: StageLayerConfigSchema.optional(),
+  // Layer 2 spatial & 2.5D camera rig
+  layoutPreset: LayoutPresetIdSchema.optional(),
+  cameraRecipe: CameraRecipeConfigSchema.optional(),
+  // Layer 3 floating Z-elevated cutouts
+  cropCallouts: z.array(CropCalloutSchema).optional(),
+  // Layer 4 light & emphasis modifiers
+  modifiers: SceneModifiersSchema.optional(),
+  // Layer 5 temporal seam transitions & event-driven Auto-SFX
+  transitionOut: SceneTransitionSchema.optional(),
+  autoSfxEvents: z.array(AutoSfxEventSchema).optional(),
 };
 
 export const SceneNodeSchema = z.discriminatedUnion('type', [
@@ -279,15 +459,18 @@ export const SceneNodeSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
+export const SceneGraphVersionSchema = z.enum(['2.0', '3.0']);
+
 export const SceneGraphSchema = z
   .object({
-    version: z.literal('2.0'),
+    version: SceneGraphVersionSchema,
     canvas: CanvasConfigSchema,
     artDirection: ArtDirectionSchema,
     cameraTrack: z.array(CameraKeyframeSchema),
     cursorTrack: z.array(CursorKeyframeSchema),
     audioTrack: z.array(AudioCueSchema),
     scenes: z.array(SceneNodeSchema),
+    beatGrid: BeatGridConfigSchema.optional(),
   })
   .refine(
     (data) => {
@@ -301,6 +484,25 @@ export const SceneGraphSchema = z
     {
       message: 'All keyframes, audio cues, and scene start frames must be within canvas.durationInFrames',
       path: ['canvas'],
+    }
+  )
+  .refine(
+    (data) => {
+      // Shotcraft Rule R4: Maximum 3 full-frame beat slams (hero-slam / flash-cut) per video
+      let slamCount = 0;
+      for (const sc of data.scenes) {
+        if (sc.transitionOut?.type === 'flash-cut') {
+          slamCount += 1;
+        }
+        if (sc.autoSfxEvents) {
+          slamCount += sc.autoSfxEvents.filter((ev) => ev.event === 'hero-slam').length;
+        }
+      }
+      return slamCount <= 3;
+    },
+    {
+      message: 'Shotcraft Rule R4 violation: full-frame beat slams (flash-cut + hero-slam) must not exceed 3 per video',
+      path: ['scenes'],
     }
   );
 
