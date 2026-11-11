@@ -107,7 +107,60 @@ Your task is to transform a SaaS Product Brief into a 100% valid, broadcast-qual
     - headline <= 60 chars
     - title <= 50 chars
 12. All keyframes, cues, and scene start frames MUST be <= 480.
-13. TAILOR EVERYTHING TO THE SPECIFIC SAAS PRODUCT: Choose scenes, headlines, copy, camera motion, and audio pacing uniquely for each product!`;
+13. TAILOR EVERYTHING TO THE SPECIFIC SAAS PRODUCT: Choose scenes, headlines, copy, camera motion, and audio pacing uniquely for each product!
+14. COMMERCIAL DATA INTEGRITY (NEVER INVENT METRICS): Never fabricate percentages, multipliers, SLA numbers, or ROI claims (like "99.98%", "10x", "+85%") unless the user explicitly provided them in verifiedMetrics, description, or features. If no quantitative metrics are provided by the user, use "saas_feature_grid" or qualitative product capabilities instead of "metric_cards".`;
+
+/**
+ * Extracts all quantitative metrics explicitly authorized by the user's ProductBrief.
+ * Combines `brief.verifiedMetrics` with any explicit quantitative tokens present in
+ * `brief.description`, `brief.tagline`, and `brief.features`.
+ */
+export function extractAuthorizedMetricsFromBrief(
+  brief: ProductBrief
+): Array<{ value: string; label: string; trend?: string; source?: string }> {
+  const result: Array<{ value: string; label: string; trend?: string; source?: string }> = [];
+  const seen = new Set<string>();
+
+  for (const vm of brief.verifiedMetrics ?? []) {
+    const key = vm.value.trim().toLowerCase();
+    if (key && !seen.has(key)) {
+      seen.add(key);
+      result.push({
+        value: vm.value.trim(),
+        label: vm.label.trim(),
+        trend: vm.trend?.trim(),
+        source: vm.source?.trim() ?? 'brief.verifiedMetrics',
+      });
+    }
+  }
+
+  const corpus = [
+    brief.description,
+    brief.tagline ?? '',
+    ...(brief.features ?? []),
+  ];
+  const tokenRegex = /([+-]?\d+(?:\.\d+)?\s*(?:%|x|×|ms|s|fps|k|m|b|\$|€))/gi;
+
+  for (const text of corpus) {
+    if (!text) continue;
+    const matches = text.match(tokenRegex);
+    if (!matches) continue;
+    for (const rawMatch of matches) {
+      const val = rawMatch.replace(/\s+/g, '');
+      const key = val.toLowerCase();
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push({
+          value: val.slice(0, 20),
+          label: text.slice(0, 60).trim(),
+          source: 'brief.text',
+        });
+      }
+    }
+  }
+
+  return result;
+}
 
 /**
  * Builds the user prompt describing the SaaS product brief.
@@ -123,6 +176,7 @@ export function buildCreativeDirectorUserPrompt(brief: ProductBrief): string {
     tone: brief.tone ?? 'tech-precision',
     primaryColor: brief.primaryColor || brief.accentColor || DEFAULT_ACCENT,
     features: brief.features ?? [],
+    verifiedMetrics: brief.verifiedMetrics ?? [],
     ctaText: brief.ctaText ?? 'Get Started Free',
     durationInFrames: 480,
     fps: 30,
@@ -452,17 +506,85 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
       if (typeof payload.headline === 'string') payload.headline = payload.headline.slice(0, 80);
       if (typeof payload.title === 'string') payload.title = payload.title.slice(0, 50);
 
-      // Supply required fields based on scene type if missing
-      const type = typeof sc.type === 'string' ? sc.type : 'product_interaction_3d';
-      if (type === 'synthetic_prompt_box' && !payload.textToType) {
+      let resolvedType = typeof sc.type === 'string' ? sc.type : 'product_interaction_3d';
+      const authorizedMetrics = extractAuthorizedMetricsFromBrief(brief);
+      const authorizedSet = new Set(authorizedMetrics.map((m) => m.value.toLowerCase()));
+
+      if (resolvedType === 'metric_cards') {
+        if (authorizedMetrics.length === 0 && !brief.allowDemoSampleMetrics) {
+          // Never allow the AI to invent commercial metrics when the user provided none:
+          // convert hallucinated metric_cards into a qualitative saas_feature_grid.
+          resolvedType = 'saas_feature_grid';
+          delete payload.metrics;
+        } else if (authorizedMetrics.length > 0) {
+          const rawList = Array.isArray(payload.metrics) ? payload.metrics : [];
+          const verifiedList = rawList
+            .map((m: unknown) => {
+              const item = (m as Record<string, unknown>) || {};
+              const val = typeof item.value === 'string' ? item.value.trim() : '';
+              if (val && authorizedSet.has(val.toLowerCase())) {
+                return {
+                  value: val.slice(0, 20),
+                  label:
+                    typeof item.label === 'string' && item.label.trim().length > 0
+                      ? item.label.slice(0, 60)
+                      : 'Verified Metric',
+                  ...(typeof item.trend === 'string' ? { trend: item.trend.slice(0, 40) } : {}),
+                  ...(typeof item.badge === 'string' ? { badge: item.badge.slice(0, 30) } : {}),
+                  provenance: 'user-verified' as const,
+                };
+              }
+              return null;
+            })
+            .filter(Boolean);
+
+          payload.metrics =
+            verifiedList.length > 0
+              ? verifiedList
+              : authorizedMetrics.slice(0, 3).map((am) => ({
+                  value: am.value.slice(0, 20),
+                  label: am.label.slice(0, 60),
+                  ...(am.trend ? { trend: am.trend.slice(0, 40) } : {}),
+                  provenance: 'user-verified' as const,
+                  sourceRef: am.source,
+                }));
+        } else {
+          // allowDemoSampleMetrics === true: explicitly tag as demo-sample
+          const rawList = Array.isArray(payload.metrics) && payload.metrics.length > 0
+            ? payload.metrics
+            : [
+                { value: '+85%', label: 'Efficiency (Sample)', trend: 'Demo simulation' },
+                { value: '10x', label: 'Workflow Speed (Sample)', trend: 'Demo simulation' },
+                { value: '99.9%', label: 'Availability (Sample)', trend: 'Demo simulation' },
+              ];
+          payload.metrics = rawList.map((m: unknown, mIdx: number) => {
+            const item = (m as Record<string, unknown>) || {};
+            return {
+              value:
+                typeof item.value === 'string' && item.value.trim().length > 0
+                  ? item.value.slice(0, 20)
+                  : `+${(mIdx + 1) * 25}%`,
+              label:
+                typeof item.label === 'string' && item.label.trim().length > 0
+                  ? item.label.slice(0, 60)
+                  : 'Sample Metric',
+              ...(typeof item.trend === 'string' ? { trend: item.trend.slice(0, 40) } : {}),
+              badge: 'DEMO SAMPLE',
+              provenance: 'demo-sample' as const,
+            };
+          });
+        }
+      }
+
+      if (resolvedType === 'synthetic_prompt_box' && !payload.textToType) {
         payload.textToType = `Deploy ${brief.productName} in seconds.`;
       }
-      if (type === 'product_interaction_3d') {
+      if (resolvedType === 'product_interaction_3d') {
         if (!payload.productName) payload.productName = brief.productName.slice(0, 50);
         if (!payload.headline) payload.headline = (brief.features?.[0] || 'Core Workflow').slice(0, 60);
         if (!payload.buttonText) payload.buttonText = (brief.ctaText || 'Get Started').slice(0, 30);
       }
-      if (type === 'kinetic_typography') {
+      if (resolvedType === 'kinetic_typography') {
         if (typeof payload.words === 'string') {
           payload.words = (payload.words as string).trim().split(/\s+/).filter(Boolean);
         } else if (!Array.isArray(payload.words) || (payload.words as unknown[]).length === 0) {
@@ -473,7 +595,7 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
           payload.words = splitWords.length > 0 ? splitWords : ['NEXT-GEN', brief.productName.toUpperCase(), 'LIVE'];
         }
       }
-      if (type === 'synthetic_hero_button') {
+      if (resolvedType === 'synthetic_hero_button') {
         if (!payload.buttonText) {
           payload.buttonText = (brief.ctaText || 'Get Started Free').slice(0, 30);
         }
@@ -481,38 +603,26 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
           payload.variant = 'glow-primary';
         }
       }
-      if (type === 'brand_closing_cta') {
+      if (resolvedType === 'brand_closing_cta') {
         if (!payload.productName) payload.productName = brief.productName.slice(0, 50);
         if (!payload.tagline) payload.tagline = (brief.tagline || brief.description).slice(0, 100);
       }
-      if (type === 'metric_cards') {
-        if (!Array.isArray(payload.metrics) || payload.metrics.length === 0) {
-          payload.metrics = [
-            { value: '+85%', label: 'Mayor Eficiencia', trend: 'Medido en producción' },
-            { value: '10x', label: 'Ahorro de Tiempo', trend: 'Automatización total' },
-            { value: '99.9%', label: 'Disponibilidad', trend: 'SLA garantizado' },
-          ];
-        } else {
-          payload.metrics = payload.metrics.map((m: unknown, mIdx: number) => {
-            const item = (m as Record<string, unknown>) || {};
-            return {
-              value: typeof item.value === 'string' && item.value.trim().length > 0 ? item.value.slice(0, 20) : `+${(mIdx + 1) * 25}%`,
-              label: typeof item.label === 'string' && item.label.trim().length > 0 ? item.label.slice(0, 60) : 'Performance',
-              ...(typeof item.trend === 'string' ? { trend: item.trend.slice(0, 40) } : {}),
-              ...(typeof item.badge === 'string' ? { badge: item.badge.slice(0, 30) } : {}),
-            };
-          });
-        }
-      }
-      if (type === 'saas_feature_grid') {
+      if (resolvedType === 'saas_feature_grid') {
         if (!payload.headline) payload.headline = `${brief.productName} Features`;
         if (!Array.isArray(payload.features) || payload.features.length < 2) {
-          payload.features = [
-            { icon: '⚡', name: 'Instant Setup', description: 'Live in under 5 minutes' },
-            { icon: '🔒', name: 'Enterprise Security', description: 'End-to-end encrypted' },
-            { icon: '📊', name: 'Real-time Analytics', description: 'Track every metric that matters' },
-            { icon: '🤖', name: 'AI Automation', description: 'Automate tasks intelligently' },
-          ];
+          const briefFeatures = brief.features && brief.features.length >= 2
+            ? brief.features.slice(0, 4).map((fName) => ({
+                icon: '✦',
+                name: fName.slice(0, 40),
+                description: `${brief.productName} capability`,
+              }))
+            : [
+                { icon: '⚡', name: 'Instant Setup', description: 'Ready for your team workflow' },
+                { icon: '🔒', name: 'Enterprise Security', description: 'End-to-end access controls' },
+                { icon: '📊', name: 'Live Observability', description: 'Track every workflow stage' },
+                { icon: '🤖', name: 'Smart Automation', description: 'Automate repetitive tasks' },
+              ];
+          payload.features = briefFeatures;
         } else {
           payload.features = payload.features.slice(0, 6).map((f: unknown, fIdx: number) => {
             const item = (f as Record<string, unknown>) || {};
@@ -524,11 +634,11 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
           });
         }
       }
-      if (type === 'conversational_mockup') {
+      if (resolvedType === 'conversational_mockup') {
         if (!Array.isArray(payload.messages) || payload.messages.length === 0) {
           payload.messages = [
-            { sender: 'user', text: `¿Cómo funciona ${brief.productName}?`, time: '10:00' },
-            { sender: 'assistant', text: `¡Hola! ${brief.productName} automatiza todo en segundos.`, time: '10:00' },
+            { sender: 'user', text: `How does ${brief.productName} work?`, time: '10:00' },
+            { sender: 'assistant', text: `${brief.productName} streamlines your workflow from end to end.`, time: '10:00' },
           ];
         } else {
           payload.messages = payload.messages.map((m: unknown, mIdx: number) => {
@@ -545,15 +655,34 @@ export function sanitizeAiSceneGraph(raw: unknown, brief: ProductBrief): unknown
           });
         }
       }
-      if (type === 'media_showcase') {
+      if (resolvedType === 'media_showcase') {
         if (!payload.headline) payload.headline = brief.productName.slice(0, 80);
         if (!payload.tagline) payload.tagline = (brief.tagline || brief.description).slice(0, 100);
+      }
+
+      // Strip any unverified quantitative metricValue from cropCallouts
+      if (Array.isArray(sc.cropCallouts)) {
+        sc.cropCallouts = (sc.cropCallouts as Record<string, unknown>[]).map((rawCallout) => {
+          const c = { ...rawCallout };
+          if (typeof c.metricValue === 'string' && c.metricValue.trim().length > 0) {
+            const valKey = c.metricValue.trim().toLowerCase();
+            if (authorizedSet.has(valKey)) {
+              c.provenance = 'user-verified';
+            } else if (brief.allowDemoSampleMetrics) {
+              c.provenance = 'demo-sample';
+              c.badge = 'DEMO SAMPLE';
+            } else {
+              delete c.metricValue;
+            }
+          }
+          return c;
+        });
       }
 
       return {
         ...sc,
         id,
-        type,
+        type: resolvedType,
         startFrame,
         fromFrame: startFrame,
         durationInFrames,

@@ -40,6 +40,11 @@ import {
   SaaSFeatureGrid,
   ShotcraftSceneComposer,
   StageAtmosphereLayer,
+  Exploded25DUI,
+  MaskReveal,
+  BentoCascade,
+  CropCalloutFocus,
+  WhipPanScene,
   type TreeNode,
 } from '../motion-kit';
 
@@ -183,7 +188,7 @@ export const FloatingParallaxFragments: React.FC<{
           zIndex: 10,
         }}
       >
-        <span>99.9% Uptime • Instant Setup</span>
+        <span>Live Workspace • Synced</span>
       </div>
     </div>
   );
@@ -375,7 +380,7 @@ export const InteractiveProductSurface: React.FC<{
   const codeTitle = activePayload?.title ?? 'Architecture & Routing';
   const footerCrest = activePayload?.tagline
     ? `${brandTitle} • ${activePayload.tagline}`
-    : `${brandTitle} Engine • Deterministic SceneGraph`;
+    : `${brandTitle} • Cloud Workspace`;
 
   // Dynamic sidebar items from features or architecture tree
   const treeFiles = (sceneGraph.scenes.find((s) => s.type === 'synthetic_code_tree')?.payload as unknown as Record<string, unknown>)?.files as string[] | undefined;
@@ -801,7 +806,7 @@ export const InteractiveProductSurface: React.FC<{
           <div id="brand-hero-card" style={{ display: 'flex', gap: 8 }}>
             <span>{footerCrest}</span>
           </div>
-          <span>Normalized Coordinate Telemetry • (x, y, t)</span>
+          <span>Live Workspace Status • Synced</span>
         </div>
       </div>
     </div>
@@ -1198,12 +1203,81 @@ export const SceneNodeRenderer: React.FC<SceneNodeRendererProps> = ({
       );
     }
 
+    case 'exploded_25d_ui': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <Exploded25DUI
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'mask_reveal': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <MaskReveal
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'bento_cascade': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <BentoCascade
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'crop_callout': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <CropCalloutFocus
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'whip_pan': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <WhipPanScene
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
     default: {
       void node;
       return null;
     }
   }
 };
+
+const NEUTRAL_CAMERA_TRACK = [
+  { frame: 0, x: 0.5, y: 0.5, zoom: 1.0, rotateX: 0, rotateY: 0, rotateZ: 0 },
+];
 
 /**
  * InteractiveSurfaceDemo:
@@ -1226,6 +1300,18 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
   const isVertical = sceneGraph.canvas.width < sceneGraph.canvas.height;
   const fallbackWidth = isVertical ? 960 : 1440;
   const fallbackHeight = isVertical ? 560 : 840;
+
+  // When an active SceneGraph v3 node owns its own Layer 2 cameraRecipe (e.g. PageCam25D),
+  // bypass the global CameraRig so we never double-transform or clip screen-space HUD bars.
+  const activeSceneOwnsCamera = sceneGraph.scenes?.some(
+    (s) =>
+      frame >= s.startFrame &&
+      frame < s.startFrame + s.durationInFrames &&
+      Boolean(s.cameraRecipe && s.cameraRecipe.mode !== 'track')
+  );
+  const effectiveCameraTrack = activeSceneOwnsCamera
+    ? NEUTRAL_CAMERA_TRACK
+    : sceneGraph.cameraTrack;
 
   return (
     <div
@@ -1264,13 +1350,13 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
 
       {/* 2. Middle Layer: Zero-Drift 3D Camera Rig with RealCaptureSurface */}
       <CameraRig
-        cameraTrack={sceneGraph.cameraTrack}
+        cameraTrack={effectiveCameraTrack}
         frame={frame}
         width={sceneGraph.canvas.width}
         height={sceneGraph.canvas.height}
       >
-        {/* Base44 Studio 3D Parallax UI Fragments */}
-        {archetype === 'base44-studio' && (
+        {/* Base44 Studio 3D Parallax UI Fragments (v2.0 legacy mode only) */}
+        {archetype === 'base44-studio' && sceneGraph.version !== '3.0' && (
           <FloatingParallaxFragments
             frame={frame}
             accent={accent}

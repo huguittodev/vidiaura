@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 960" width="1600" height="960">
+  <defs>
+    <linearGradient id="zgBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#090A10" />
+      <stop offset="55%" stop-color="#111320" />
+      <stop offset="100%" stop-color="#0B0D16" />
+    </linearGradient>
+    <linearGradient id="zgAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7C3AED" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+    <pattern id="zgGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(124, 58, 237, 0.14)" stroke-width="1" />
+    </pattern>
+  </defs>
+
+  <!-- Studio Canvas Background -->
+  <rect width="1600" height="960" fill="url(#zgBg)" />
+  <rect width="1600" height="960" fill="url(#zgGrid)" />
+
+  <!-- Left Design Token & Layer Tree Sidebar -->
+  <rect x="28" y="28" width="310" height="904" rx="18" fill="#131624" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" />
+  <circle cx="62" cy="64" r="10" fill="#A855F7" />
+  <text x="84" y="70" fill="#F8FAFC" font-family="Inter, system-ui, sans-serif" font-size="20" font-weight="800">ZentioGrid Studio</text>
+  <text x="50" y="114" fill="#94A3B8" font-family="monospace" font-size="13" font-weight="700">DESIGN TOKENS • CSS GRID</text>
+
+  <rect x="46" y="134" width="274" height="54" rx="10" fill="#1C2033" stroke="#7C3AED" stroke-width="1.5" />
+  <text x="64" y="166" fill="#F8FAFC" font-family="monospace" font-size="15" font-weight="700">--grid-cols: repeat(12, 1fr)</text>
+
+  <rect x="46" y="202" width="274" height="54" rx="10" fill="#181B2C" />
+  <text x="64" y="234" fill="#CBD5E1" font-family="monospace" font-size="15">--space-fluid: clamp(16px, 2vw)</text>
+
+  <rect x="46" y="270" width="274" height="54" rx="10" fill="#181B2C" />
+  <text x="64" y="302" fill="#CBD5E1" font-family="monospace" font-size="15">--radius-card: 20px</text>
+
+  <text x="50" y="366" fill="#94A3B8" font-family="monospace" font-size="13" font-weight="700">COMPONENT AST TREE</text>
+  <rect x="46" y="386" width="274" height="44" rx="8" fill="rgba(124,58,237,0.18)" />
+  <text x="64" y="414" fill="#E2E8F0" font-family="monospace" font-size="15" font-weight="700">▾ &lt;ResponsiveGridStage /&gt;</text>
+  <text x="82" y="462" fill="#94A3B8" font-family="monospace" font-size="14">├─ &lt;HeroBentoSpan cols={8} /&gt;</text>
+  <text x="82" y="496" fill="#94A3B8" font-family="monospace" font-size="14">├─ &lt;TokenInspector cols={4} /&gt;</text>
+  <text x="82" y="530" fill="#94A3B8" font-family="monospace" font-size="14">└─ &lt;BreakpointBar mode="auto" /&gt;</text>
+
+  <!-- Center 12-Column Visual Grid Canvas -->
+  <rect x="362" y="28" width="860" height="904" rx="20" fill="#0F121E" stroke="rgba(168,85,247,0.35)" stroke-width="1.5" />
+  <!-- 12 Column GuideOverlays -->
+  <g fill="rgba(124, 58, 237, 0.06)" stroke="rgba(124, 58, 237, 0.16)" stroke-dasharray="4 4">
+    <rect x="390" y="92" width="56" height="810" />
+    <rect x="458" y="92" width="56" height="810" />
+    <rect x="526" y="92" width="56" height="810" />
+    <rect x="594" y="92" width="56" height="810" />
+    <rect x="662" y="92" width="56" height="810" />
+    <rect x="730" y="92" width="56" height="810" />
+    <rect x="798" y="92" width="56" height="810" />
+    <rect x="866" y="92" width="56" height="810" />
+    <rect x="934" y="92" width="56" height="810" />
+    <rect x="1002" y="92" width="56" height="810" />
+    <rect x="1070" y="92" width="56" height="810" />
+    <rect x="1138" y="92" width="56" height="810" />
+  </g>
+
+  <!-- Breakpoint Top Pill -->
+  <rect x="390" y="46" width="804" height="36" rx="10" fill="#181C2E" />
+  <text x="412" y="69" fill="#38BDF8" font-family="monospace" font-size="14" font-weight="700">12-COLUMN CSS GRID • 1440px DESKTOP / 768px TABLET / 390px MOBILE</text>
+
+  <!-- Visual Grid Blocks inside Canvas -->
+  <rect x="390" y="108" width="532" height="320" rx="18" fill="#171B2E" stroke="#A855F7" stroke-width="2" />
+  <text x="422" y="158" fill="#A855F7" font-family="monospace" font-size="14" font-weight="700">SPAN 8 • HERO CONTAINER</text>
+  <text x="422" y="212" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="34" font-weight="800">Visual Grid to Production React</text>
+  <rect x="422" y="252" width="220" height="46" rx="12" fill="url(#zgAccent)" />
+  <text x="454" y="281" fill="#FFFFFF" font-family="Inter, sans-serif" font-size="16" font-weight="700">Export Strict TSX</text>
+
+  <rect x="934" y="108" width="260" height="320" rx="18" fill="#171B2E" stroke="rgba(56,189,248,0.5)" stroke-width="1.5" />
+  <text x="960" y="158" fill="#38BDF8" font-family="monospace" font-size="14" font-weight="700">SPAN 4 • TOKENS</text>
+  <text x="960" y="216" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="28" font-weight="800">Zero Drift</text>
+  <text x="960" y="252" fill="#94A3B8" font-family="Inter, sans-serif" font-size="16">CSS Vars + Tailwind</text>
+
+  <rect x="390" y="452" width="396" height="240" rx="18" fill="#171B2E" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" />
+  <text x="420" y="500" fill="#22C55E" font-family="monospace" font-size="14" font-weight="700">SPAN 6 • BREAKPOINT AUTO-FLOW</text>
+  <text x="420" y="550" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="26" font-weight="700">Subgrid Alignment Lock</text>
+
+  <rect x="798" y="452" width="396" height="240" rx="18" fill="#171B2E" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" />
+  <text x="828" y="500" fill="#A855F7" font-family="monospace" font-size="14" font-weight="700">SPAN 6 • EDGE PREVIEW</text>
+  <text x="828" y="550" fill="#F8FAFC" font-family="Inter, sans-serif" font-size="26" font-weight="700">Instant Branch URL</text>
+
+  <!-- Right Live TypeScript Code Compiler Drawer -->
+  <rect x="1246" y="28" width="326" height="904" rx="18" fill="#131624" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" />
+  <text x="1272" y="70" fill="#38BDF8" font-family="monospace" font-size="15" font-weight="700">LIVE TSX COMPILER</text>
+  <text x="1272" y="122" fill="#A855F7" font-family="monospace" font-size="14">export function</text>
+  <text x="1272" y="148" fill="#F8FAFC" font-family="monospace" font-size="14">  BentoStage() &#123;</text>
+  <text x="1272" y="178" fill="#94A3B8" font-family="monospace" font-size="13">  return (</text>
+  <text x="1272" y="206" fill="#38BDF8" font-family="monospace" font-size="13">    &lt;Grid cols=&#123;12&#125;</text>
+  <text x="1272" y="232" fill="#38BDF8" font-family="monospace" font-size="13">      gap="var(--space-md)"&gt;</text>
+  <text x="1272" y="260" fill="#22C55E" font-family="monospace" font-size="13">      &lt;Cell span=&#123;8&#125; /&gt;</text>
+  <text x="1272" y="288" fill="#22C55E" font-family="monospace" font-size="13">      &lt;Cell span=&#123;4&#125; /&gt;</text>
+  <text x="1272" y="316" fill="#38BDF8" font-family="monospace" font-size="13">    &lt;/Grid&gt;</text>
+  <text x="1272" y="344" fill="#94A3B8" font-family="monospace" font-size="13">  );</text>
+  <text x="1272" y="370" fill="#F8FAFC" font-family="monospace" font-size="14">&#125;</text>
+</svg>
+

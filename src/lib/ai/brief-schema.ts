@@ -6,7 +6,12 @@
  */
 
 import { z } from 'zod';
-import { BackdropVariantSchema, HexColorRegex, SurfaceThemeSchema } from '../scene-graph/schema';
+import {
+  BackdropVariantSchema,
+  HexColorRegex,
+  MetricProvenanceSchema,
+  SurfaceThemeSchema,
+} from '../scene-graph/schema';
 
 export const BrandToneSchema = z.enum([
   'tech-precision',
@@ -38,6 +43,16 @@ export const BriefAssetSchema = z.object({
 
 export type BriefAsset = z.infer<typeof BriefAssetSchema>;
 
+export const VerifiedBriefMetricSchema = z.object({
+  value: z.string().trim().min(1).max(20),
+  label: z.string().trim().min(1).max(60),
+  trend: z.string().trim().max(40).optional(),
+  source: z.string().trim().max(120).optional(),
+  provenance: MetricProvenanceSchema.optional(),
+});
+
+export type VerifiedBriefMetric = z.infer<typeof VerifiedBriefMetricSchema>;
+
 export const ProductBriefSchema = z.object({
   productName: z
     .string()
@@ -68,6 +83,12 @@ export const ProductBriefSchema = z.object({
     .max(5)
     .optional()
     .default([]),
+  verifiedMetrics: z
+    .array(VerifiedBriefMetricSchema)
+    .max(6)
+    .optional()
+    .default([]),
+  allowDemoSampleMetrics: z.boolean().optional().default(false),
   ctaText: z.string().trim().max(30).optional().default('Get Started Free'),
   durationSeconds: z.number().int().min(15).max(20).optional().default(16),
   targetDurationInFrames: z.number().int().positive().optional().default(480),

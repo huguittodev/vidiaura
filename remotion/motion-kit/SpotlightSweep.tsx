@@ -76,9 +76,10 @@ export const DigitRoll: React.FC<{
                 lineHeight: `${lineH}px`,
                 color,
                 fontWeight: typography.weight.bold,
+                whiteSpace: 'pre',
               }}
             >
-              {ch}
+              {ch === ' ' ? '\u00A0' : ch}
             </span>
           );
         }

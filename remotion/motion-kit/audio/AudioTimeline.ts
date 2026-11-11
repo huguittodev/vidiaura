@@ -467,9 +467,52 @@ export function compileSceneAutoSfx(params: {
       }
     }
 
-    // 2. Event-driven Auto-SFX (Layer 5)
-    if (scene.autoSfxEvents) {
-      for (const ev of scene.autoSfxEvents) {
+    // 2. Event-driven Auto-SFX (Layer 5) + Default Atomic SFX for Batch 1 Atoms
+    const explicitEvents = scene.autoSfxEvents && scene.autoSfxEvents.length > 0
+      ? scene.autoSfxEvents
+      : (() => {
+          switch (scene.type) {
+            case 'mask_reveal':
+              return [
+                { id: 'mask-riser', frame: 8, event: 'spotlight-whoosh' as const, volume: 0.62 },
+                { id: 'mask-slam', frame: Math.min(36, Math.floor(scene.durationInFrames * 0.4)), event: 'hero-slam' as const, volume: 0.72 },
+                { id: 'mask-kpis', frame: Math.min(54, Math.floor(scene.durationInFrames * 0.62)), event: 'rapid-batch-tick' as const, burstCount: 3, burstIntervalFrames: 4 },
+              ];
+            case 'exploded_25d_ui':
+              return [
+                { id: 'exploded-whoosh', frame: 6, event: 'spotlight-whoosh' as const, volume: 0.64 },
+                { id: 'exploded-cards', frame: 18, event: 'rapid-batch-tick' as const, burstCount: 4, burstIntervalFrames: 4 },
+                { id: 'exploded-lift', frame: Math.min(48, Math.floor(scene.durationInFrames * 0.55)), event: 'ui-card-pop' as const, volume: 0.65 },
+              ];
+            case 'bento_cascade': {
+              const cardCount = Math.min(6, scene.payload.cards?.length ?? 5);
+              return [
+                { id: 'bento-press', frame: 8, event: 'ui-card-pop' as const, volume: 0.55 },
+                { id: 'bento-deal', frame: 16, event: 'rapid-batch-tick' as const, burstCount: cardCount, burstIntervalFrames: 3 },
+                { id: 'bento-settle', frame: Math.min(56, Math.floor(scene.durationInFrames * 0.68)), event: 'sheen-shimmer' as const, volume: 0.54 },
+              ];
+            }
+            case 'crop_callout': {
+              const targetCount = Math.min(4, scene.payload.targets?.length ?? 3);
+              return [
+                { id: 'scan-start', frame: 6, event: 'spotlight-whoosh' as const, volume: 0.56 },
+                { id: 'scan-locks', frame: 18, event: 'rapid-batch-tick' as const, burstCount: targetCount, burstIntervalFrames: 8 },
+                { id: 'scan-confirm', frame: Math.min(62, Math.floor(scene.durationInFrames * 0.72)), event: 'metric-roll' as const, volume: 0.58 },
+              ];
+            }
+            case 'whip_pan':
+              return [
+                { id: 'whip-launch', frame: 4, event: 'whip-transition' as const, volume: 0.68 },
+                { id: 'whip-ticks', frame: 10, event: 'rapid-batch-tick' as const, burstCount: 4, burstIntervalFrames: 4 },
+                { id: 'whip-lock', frame: Math.min(54, Math.floor(scene.durationInFrames * 0.65)), event: 'cta-chime' as const, volume: 0.68 },
+              ];
+            default:
+              return [];
+          }
+        })();
+
+    if (explicitEvents.length > 0) {
+      for (const ev of explicitEvents) {
         const targetPeak = scene.startFrame + ev.frame;
         if (targetPeak >= durationInFrames) continue;
 

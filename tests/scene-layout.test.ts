@@ -199,10 +199,14 @@ describe('stage layout', () => {
 
   test('8. every SceneGraph scene type has a registered preset', () => {
     assert.deepEqual(Object.keys(SCENE_LAYOUT_PRESETS).sort(), [
+      'bento_cascade',
       'brand_closing_cta',
       'conversational_mockup',
+      'crop_callout',
+      'exploded_25d_ui',
       'icon_grid_morph',
       'kinetic_typography',
+      'mask_reveal',
       'media_showcase',
       'metric_cards',
       'product_interaction_3d',
@@ -211,6 +215,7 @@ describe('stage layout', () => {
       'synthetic_connect_pills',
       'synthetic_hero_button',
       'synthetic_prompt_box',
+      'whip_pan',
     ]);
   });
 

@@ -20,3 +20,4 @@ export * from './Polish';
 export * from './PageCam25D';
 export * from './SpotlightSweep';
 export * from './ShotcraftSceneComposer';
+export * from './ShotcraftBatch1Atoms';

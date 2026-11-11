@@ -196,11 +196,24 @@ export interface MediaShowcasePayload {
   panDirection?: 'none' | 'left' | 'right' | 'up' | 'down';
 }
 
+export type MetricProvenance = 'user-verified' | 'product-spec' | 'demo-sample';
+
+export interface VerifiedMetricEntry {
+  value: string;
+  label: string;
+  source?: string;
+  provenance?: MetricProvenance;
+}
+
+export type CommercialIntegrityMode = 'strict' | 'demo-labeled' | 'legacy';
+
 export interface MetricCardItem {
   value: string;
   label: string;
   trend?: string;
   badge?: string;
+  provenance?: MetricProvenance;
+  sourceRef?: string;
 }
 
 export interface MetricCardsPayload {
@@ -217,6 +230,8 @@ export interface ChatMessageItem {
 
 export interface ConversationalMockupPayload {
   headline?: string;
+  assistantName?: string;
+  statusText?: string;
   messages: ChatMessageItem[];
 }
 
@@ -230,6 +245,108 @@ export interface SaaSFeatureGridPayload {
   headline: string;
   features: SaaSFeatureItem[];
   staggerFrames?: number;
+}
+
+/* ========================================================================= */
+/* Phase 2 (Shotcraft Top 25 — Batch 1) Reusable Atom Payloads               */
+/* ========================================================================= */
+
+export interface ExplodedLayerCard {
+  id: string;
+  title: string;
+  subtitle?: string;
+  badge?: string;
+  depthPlane?: 'background' | 'midground' | 'foreground';
+  items?: string[];
+  accentColor?: string;
+}
+
+export interface Exploded25DUIPayload {
+  eyebrow?: string;
+  headline: string;
+  subheadline?: string;
+  surfaceTitle?: string;
+  mediaUrl?: string;
+  heroIndex?: number;
+  cameraDrivePx?: number;
+  layers: ExplodedLayerCard[];
+  foregroundPills?: string[];
+}
+
+export interface MaskRevealModule {
+  label: string;
+  progress: number;
+}
+
+export interface MaskRevealPayload {
+  maskWord: string;
+  eyebrow?: string;
+  headline: string;
+  subheadline?: string;
+  dashboardTitle: string;
+  statusBadge?: string;
+  mediaUrl?: string;
+  sidebarItems?: string[];
+  kpis?: MetricCardItem[];
+  modules?: MaskRevealModule[];
+}
+
+export interface BentoCascadeCard {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  badge?: string;
+  accentColor?: string;
+  span?: 'normal' | 'wide';
+}
+
+export interface BentoCascadePayload {
+  eyebrow?: string;
+  headline: string;
+  subheadline?: string;
+  counterLabel?: string;
+  cards: BentoCascadeCard[];
+}
+
+export interface CropCalloutTarget {
+  id: string;
+  head: string;
+  detail: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  tagPosition?: 'right' | 'above' | 'below' | 'belowRight';
+  metricValue?: string;
+  provenance?: MetricProvenance;
+}
+
+export interface CropCalloutPayload {
+  statusLabel?: string;
+  windowTitle: string;
+  headline: string;
+  subheadline?: string;
+  ctaLabel?: string;
+  mediaUrl?: string;
+  targets: CropCalloutTarget[];
+}
+
+export interface WhipPanPanel {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  badge?: string;
+  highlights?: string[];
+  mediaUrl?: string;
+}
+
+export interface WhipPanPayload {
+  eyebrow: string;
+  targetIndex?: number;
+  direction?: 'horizontal' | 'vertical';
+  panels: WhipPanPanel[];
 }
 
 /* ========================================================================= */
@@ -287,6 +404,9 @@ export interface CropCallout {
   elevationZ?: number;
   enterFrame?: number;
   accentColor?: string;
+  provenance?: MetricProvenance;
+  sourceRef?: string;
+  showBracket?: boolean;
 }
 
 export interface SpotlightModifier {
@@ -367,6 +487,12 @@ export interface BeatGridConfig {
   outputAudioOffsetFrames?: number;
 }
 
+export interface SceneDebugMeta {
+  recipeId?: string;
+  engineNotes?: string;
+  ruleRefs?: string[];
+}
+
 /* Base Scene Node */
 export interface BaseSceneNode {
   id: string;
@@ -381,6 +507,7 @@ export interface BaseSceneNode {
   modifiers?: SceneModifiers;
   transitionOut?: SceneTransition;
   autoSfxEvents?: AutoSfxEvent[];
+  debugMeta?: SceneDebugMeta;
 }
 
 export interface KineticTypographySceneNode extends BaseSceneNode {
@@ -443,6 +570,31 @@ export interface SaaSFeatureGridSceneNode extends BaseSceneNode {
   payload: SaaSFeatureGridPayload;
 }
 
+export interface Exploded25DUISceneNode extends BaseSceneNode {
+  type: 'exploded_25d_ui';
+  payload: Exploded25DUIPayload;
+}
+
+export interface MaskRevealSceneNode extends BaseSceneNode {
+  type: 'mask_reveal';
+  payload: MaskRevealPayload;
+}
+
+export interface BentoCascadeSceneNode extends BaseSceneNode {
+  type: 'bento_cascade';
+  payload: BentoCascadePayload;
+}
+
+export interface CropCalloutSceneNode extends BaseSceneNode {
+  type: 'crop_callout';
+  payload: CropCalloutPayload;
+}
+
+export interface WhipPanSceneNode extends BaseSceneNode {
+  type: 'whip_pan';
+  payload: WhipPanPayload;
+}
+
 /**
  * Discriminated union of all supported scene types.
  */
@@ -458,7 +610,12 @@ export type SceneNode =
   | MediaShowcaseSceneNode
   | MetricCardsSceneNode
   | ConversationalMockupSceneNode
-  | SaaSFeatureGridSceneNode;
+  | SaaSFeatureGridSceneNode
+  | Exploded25DUISceneNode
+  | MaskRevealSceneNode
+  | BentoCascadeSceneNode
+  | CropCalloutSceneNode
+  | WhipPanSceneNode;
 
 export type SceneGraphVersion = '2.0' | '3.0';
 
@@ -474,4 +631,6 @@ export interface SceneGraph {
   audioTrack: AudioCue[];
   scenes: SceneNode[];
   beatGrid?: BeatGridConfig;
+  commercialIntegrityMode?: CommercialIntegrityMode;
+  verifiedMetricsRegistry?: VerifiedMetricEntry[];
 }

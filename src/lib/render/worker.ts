@@ -240,12 +240,23 @@ export class RenderWorker {
       }
 
       // 4. Remotion Media Rendering
+      // Map quality (1..100, default 80) to visually lossless H.264/H.265 CRF (~20 at quality=80)
+      const supportsCrf = job.settings.codec === 'h264' || job.settings.codec === 'h265';
+      const resolvedCrf = supportsCrf
+        ? Math.round(28 - ((job.settings.quality ?? 80) / 100) * 10)
+        : undefined;
+
       await this.renderMediaFn({
         composition,
         serveUrl: bundleServeUrl,
         codec: job.settings.codec,
         audioCodec: job.settings.audioCodec,
         imageFormat: job.settings.imageFormat,
+        jpegQuality:
+          job.settings.imageFormat === 'jpeg'
+            ? Math.max(50, Math.min(100, job.settings.quality ?? 85))
+            : undefined,
+        crf: resolvedCrf,
         scale: job.settings.scale,
         outputLocation: job.outputPath!,
         inputProps,

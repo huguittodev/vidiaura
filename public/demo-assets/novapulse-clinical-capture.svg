@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 960" width="1600" height="960">
+  <defs>
+    <linearGradient id="npBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FAF8F4" />
+      <stop offset="60%" stop-color="#F5F2EB" />
+      <stop offset="100%" stop-color="#EDEAE2" />
+    </linearGradient>
+    <linearGradient id="npAccent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FF5C35" />
+      <stop offset="100%" stop-color="#0D9488" />
+    </linearGradient>
+  </defs>
+
+  <!-- Warm Editorial Light Surface -->
+  <rect width="1600" height="960" fill="url(#npBg)" />
+
+  <!-- Top Clinical Command Header -->
+  <rect x="36" y="32" width="1528" height="84" rx="18" fill="#FFFFFF" stroke="#ECE7DE" stroke-width="2" />
+  <circle cx="80" cy="74" r="12" fill="#FF5C35" />
+  <text x="108" y="82" fill="#181716" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="800">NovaPulse Clinical Operations</text>
+  <rect x="1260" y="52" width="276" height="44" rx="22" fill="#FFF7ED" stroke="#FF5C35" stroke-width="1.5" />
+  <text x="1288" y="80" fill="#FF5C35" font-family="monospace" font-size="14" font-weight="700">DEMO SAMPLE TELEMETRY</text>
+
+  <!-- Left Triage Queue & Acuity Routing -->
+  <rect x="36" y="140" width="460" height="784" rx="20" fill="#FFFFFF" stroke="#ECE7DE" stroke-width="2" />
+  <text x="68" y="190" fill="#FF5C35" font-family="monospace" font-size="14" font-weight="700">ACUITY TRIAGE QUEUE</text>
+  <text x="68" y="232" fill="#181716" font-family="Inter, sans-serif" font-size="28" font-weight="800">Active Admissions</text>
+
+  <rect x="64" y="264" width="404" height="128" rx="16" fill="#FBF9F5" stroke="#FF5C35" stroke-width="2" />
+  <text x="88" y="304" fill="#FF5C35" font-family="monospace" font-size="13" font-weight="700">PRIORITY 01 • CARDIAC TELEMETRY</text>
+  <text x="88" y="340" fill="#181716" font-family="Inter, sans-serif" font-size="22" font-weight="700">Ward 4B → Bed 12 Assigned</text>
+  <text x="88" y="370" fill="#555148" font-family="Inter, sans-serif" font-size="15">Auto-routed via Nurse Handoff Protocol</text>
+
+  <rect x="64" y="412" width="404" height="128" rx="16" fill="#FBF9F5" stroke="#ECE7DE" stroke-width="1.5" />
+  <text x="88" y="452" fill="#0D9488" font-family="monospace" font-size="13" font-weight="700">PRIORITY 02 • POST-OP RECOVERY</text>
+  <text x="88" y="488" fill="#181716" font-family="Inter, sans-serif" font-size="22" font-weight="700">East Wing → Bed 04 Ready</text>
+  <text x="88" y="518" fill="#555148" font-family="Inter, sans-serif" font-size="15">Lab panel verified • Pharmacy synced</text>
+
+  <rect x="64" y="560" width="404" height="128" rx="16" fill="#FBF9F5" stroke="#ECE7DE" stroke-width="1.5" />
+  <text x="88" y="600" fill="#555148" font-family="monospace" font-size="13" font-weight="700">PRIORITY 03 • DISCHARGE CLEARANCE</text>
+  <text x="88" y="636" fill="#181716" font-family="Inter, sans-serif" font-size="22" font-weight="700">3 Beds Turning Over</text>
+  <text x="88" y="666" fill="#555148" font-family="Inter, sans-serif" font-size="15">Environmental services notified</text>
+
+  <!-- Right Ward Capacity & Shift Handoff Matrix -->
+  <rect x="524" y="140" width="1040" height="420" rx="20" fill="#FFFFFF" stroke="#ECE7DE" stroke-width="2" />
+  <text x="560" y="190" fill="#0D9488" font-family="monospace" font-size="14" font-weight="700">LIVE WARD CAPACITY MATRIX (ILLUSTRATIVE DEMO)</text>
+  <text x="560" y="234" fill="#181716" font-family="Inter, sans-serif" font-size="30" font-weight="800">Multi-Wing Bed &amp; Staffing Balance</text>
+
+  <rect x="560" y="268" width="300" height="250" rx="16" fill="#F7F5F0" stroke="#D6D2C7" stroke-width="1.5" />
+  <text x="588" y="312" fill="#555148" font-family="monospace" font-size="14" font-weight="700">ICU NORTH</text>
+  <text x="588" y="376" fill="#181716" font-family="Inter, sans-serif" font-size="48" font-weight="800">18 / 20</text>
+  <text x="588" y="418" fill="#0D9488" font-family="Inter, sans-serif" font-size="17" font-weight="700">2 Rapid-Response Beds Open</text>
+
+  <rect x="888" y="268" width="300" height="250" rx="16" fill="#F7F5F0" stroke="#D6D2C7" stroke-width="1.5" />
+  <text x="916" y="312" fill="#555148" font-family="monospace" font-size="14" font-weight="700">STEP-DOWN TELEMETRY</text>
+  <text x="916" y="376" fill="#181716" font-family="Inter, sans-serif" font-size="48" font-weight="800">31 / 36</text>
+  <text x="916" y="418" fill="#FF5C35" font-family="Inter, sans-serif" font-size="17" font-weight="700">5 Discharges Scheduled</text>
+
+  <rect x="1216" y="268" width="312" height="250" rx="16" fill="#F7F5F0" stroke="#D6D2C7" stroke-width="1.5" />
+  <text x="1244" y="312" fill="#555148" font-family="monospace" font-size="14" font-weight="700">SURGICAL RECOVERY</text>
+  <text x="1244" y="376" fill="#181716" font-family="Inter, sans-serif" font-size="48" font-weight="800">14 / 16</text>
+  <text x="1244" y="418" fill="#0D9488" font-family="Inter, sans-serif" font-size="17" font-weight="700">Handoff Checklist Complete</text>
+
+  <!-- Bottom Timeline Bar -->
+  <rect x="524" y="584" width="1040" height="340" rx="20" fill="#FFFFFF" stroke="#ECE7DE" stroke-width="2" />
+  <text x="560" y="636" fill="#FF5C35" font-family="monospace" font-size="14" font-weight="700">SHIFT HANDOFF SYNCHRONIZATION</text>
+  <text x="560" y="680" fill="#181716" font-family="Inter, sans-serif" font-size="28" font-weight="800">Zero Dropped Clinical Context</text>
+  <rect x="560" y="720" width="968" height="28" rx="14" fill="#F3EFE9" />
+  <rect x="560" y="720" width="760" height="28" rx="14" fill="url(#npAccent)" />
+  <text x="560" y="790" fill="#555148" font-family="Inter, sans-serif" font-size="18">Automated SBAR synthesis • Lab alert routing • Real-time bed turnover</text>
+</svg>
+

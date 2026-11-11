@@ -83,6 +83,11 @@ export const SCENE_LAYOUT_PRESETS: Record<SceneNode['type'], LayoutPresetId> = {
   metric_cards: 'bento',
   conversational_mockup: 'pair',
   saas_feature_grid: 'bento',
+  exploded_25d_ui: 'stage',
+  mask_reveal: 'hook',
+  bento_cascade: 'bento',
+  crop_callout: 'stage',
+  whip_pan: 'stage',
 };
 
 /**

@@ -207,7 +207,7 @@ const grainCache = new Map<string, string>();
 export const getGrainTileDataUri = (
   variant: number,
   tile: number = 256,
-  freq: number = 0.85
+  freq: number = 0.65
 ): string => {
   const safeVariant = ((Math.floor(variant) % 6) + 6) % 6;
   const key = `${safeVariant}|${tile}|${freq}`;
@@ -219,8 +219,8 @@ export const getGrainTileDataUri = (
     `<filter id='g' x='0' y='0' width='100%' height='100%' color-interpolation-filters='sRGB'>` +
     `<feTurbulence type='fractalNoise' baseFrequency='${freq}' numOctaves='2' seed='${safeVariant * 17 + 3}' stitchTiles='stitch'/>` +
     `<feColorMatrix type='matrix' values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/>` +
-    `<feComponentTransfer><feFuncR type='linear' slope='2.4' intercept='-0.7'/><feFuncG type='linear' slope='2.4' intercept='-0.7'/>` +
-    `<feFuncB type='linear' slope='2.4' intercept='-0.7'/></feComponentTransfer></filter>` +
+    `<feComponentTransfer><feFuncR type='linear' slope='1.5' intercept='-0.25'/><feFuncG type='linear' slope='1.5' intercept='-0.25'/>` +
+    `<feFuncB type='linear' slope='1.5' intercept='-0.25'/></feComponentTransfer></filter>` +
     `<rect width='100%' height='100%' filter='url(#g)'/></svg>`;
   const url = `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
   grainCache.set(key, url);
@@ -230,20 +230,23 @@ export const getGrainTileDataUri = (
 export const Grain: React.FC<{
   opacity?: number;
   step?: number;
+  frameHold?: number;
   scale?: number;
   freq?: number;
   blend?: React.CSSProperties['mixBlendMode'];
   style?: React.CSSProperties;
 }> = ({
-  opacity = 0.06,
-  step = 2,
+  opacity = 0.032,
+  step = 10,
+  frameHold,
   scale = 1,
-  freq = 0.85,
+  freq = 0.65,
   blend = 'overlay',
   style,
 }) => {
   const frame = useCurrentFrame();
-  const k = Math.floor(frame / Math.max(1, step));
+  const effectiveStep = frameHold ?? step;
+  const k = Math.floor(frame / Math.max(1, effectiveStep));
   const tile = 256;
   const ox = Math.floor(deterministicHash(k * 3 + 1) * tile);
   const oy = Math.floor(deterministicHash(k * 7 + 2) * tile);

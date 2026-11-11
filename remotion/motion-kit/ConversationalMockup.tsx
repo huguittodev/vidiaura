@@ -1,6 +1,14 @@
 import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-import { alpha, neutral, signal } from '../../src/lib/design/tokens';
+import {
+  alpha,
+  neutral,
+  radius as tokenRadius,
+  signal,
+  space,
+  typography,
+} from '../../src/lib/design/tokens';
+import { rgbaOf, softShadow } from './Polish';
 
 export interface ChatMessage {
   sender: 'user' | 'assistant';
@@ -10,6 +18,8 @@ export interface ChatMessage {
 
 export interface ConversationalMockupProps {
   headline?: string;
+  assistantName?: string;
+  statusText?: string;
   messages: ChatMessage[];
   accentColor?: string;
   isDark?: boolean;
@@ -17,20 +27,32 @@ export interface ConversationalMockupProps {
 }
 
 /**
+ * Detects whether the conversation copy is predominantly Spanish so default labels
+ * match the language of the messages when explicit `assistantName` / `statusText` are omitted.
+ */
+function isSpanishCopy(headline?: string, messages?: ChatMessage[]): boolean {
+  const sample = `${headline ?? ''} ${(messages ?? []).map((m) => m.text).join(' ')}`;
+  return /[áéíóúñ¿¡]/i.test(sample) || /\b(hola|disponibilidad|gracias|cómo|para)\b/i.test(sample);
+}
+
+/**
  * ConversationalMockup:
- * Atomic Remotion component rendering mobile or desktop conversational threads (WhatsApp/AI agent)
- * with animated sequential speech bubbles, typing indicators, and delivery checkmarks.
+ * Atomic Remotion component rendering desktop/mobile AI Copilot & conversational threads
+ * with studio-scale proportions, sequential speech bubbles, and language-consistent chrome.
  */
 export const ConversationalMockup: React.FC<ConversationalMockupProps> = ({
-  headline = 'Automatización Instantánea por WhatsApp',
+  headline,
+  assistantName,
+  statusText,
   messages,
   accentColor = signal.green,
   isDark = true,
   frame: frameProp,
 }) => {
   const currentFrame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, width, height } = useVideoConfig();
   const f = frameProp ?? currentFrame;
+  const isVertical = width < height;
 
   const headerSpring = spring({
     frame: f,
@@ -38,11 +60,37 @@ export const ConversationalMockup: React.FC<ConversationalMockupProps> = ({
     config: { damping: 14, stiffness: 90 },
   });
 
-  const chatMessages: ChatMessage[] = messages.length > 0 ? messages.slice(0, 3) : [
-    { sender: 'user', text: 'Hola, ¿tienen disponibilidad para mañana a las 11:00?', time: '10:42' },
-    { sender: 'assistant', text: '¡Hola! Sí, confirmado tu hueco a las 11:00 con el especialista.', time: '10:42' },
-    { sender: 'user', text: '¡Genial, muchas gracias!', time: '10:43' },
-  ];
+  const chatMessages: ChatMessage[] =
+    messages.length > 0
+      ? messages.slice(0, 3)
+      : [
+          {
+            sender: 'user',
+            text: 'Generate a responsive 3-column pricing grid with dark mode tokens.',
+            time: '10:42',
+          },
+          {
+            sender: 'assistant',
+            text: 'Synthesized 3-column CSS Grid component with semantic design tokens and keyboard accessibility.',
+            time: '10:42',
+          },
+          {
+            sender: 'user',
+            text: 'Ship it to the staging preview branch.',
+            time: '10:43',
+          },
+        ];
+
+  const spanish = isSpanishCopy(headline, chatMessages);
+  const resolvedHeadline =
+    headline ?? (spanish ? 'Asistente IA en Tiempo Real' : 'AI Copilot Workflow');
+  const resolvedAssistant =
+    assistantName ?? (spanish ? 'Asistente Inteligente' : 'AI Systems Copilot');
+  const resolvedStatus =
+    statusText ??
+    (spanish
+      ? '● Activo • Síntesis en tiempo real'
+      : '● Online • Real-time synthesis');
 
   return (
     <div
@@ -53,40 +101,44 @@ export const ConversationalMockup: React.FC<ConversationalMockupProps> = ({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 40,
+        padding: isVertical ? `${space.xl}px ${space.lg}px` : `${space.xxl}px`,
         boxSizing: 'border-box',
-        gap: 30,
+        gap: space.xl,
+        fontFamily: typography.fontFamily,
       }}
     >
       {/* Title */}
-      {headline && (
+      {resolvedHeadline && (
         <h2
           style={{
-            fontSize: 34,
-            fontWeight: 800,
+            fontSize: isVertical ? 42 : 48,
+            fontWeight: typography.weight.black,
             color: isDark ? neutral.white : neutral.ink,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.025em',
             margin: 0,
             textAlign: 'center',
             opacity: headerSpring,
             transform: `translateY(${interpolate(headerSpring, [0, 1], [-20, 0])}px)`,
           }}
         >
-          {headline}
+          {resolvedHeadline}
         </h2>
       )}
 
-      {/* Chat Container Phone / Card */}
+      {/* Studio-Scale Chat Container Card */}
       <div
         style={{
           width: '100%',
-          maxWidth: 580,
-          borderRadius: 24,
+          maxWidth: isVertical ? 880 : 940,
+          borderRadius: tokenRadius.xl,
           backgroundColor: isDark ? neutral.nightRaised : neutral.white,
-          border: isDark ? `1px solid ${alpha.white08}` : `1px solid ${neutral.border}`,
-          boxShadow: isDark
-            ? '0 25px 60px rgba(0,0,0,0.4), 0 0 40px rgba(34, 197, 94, 0.12)'
-            : '0 20px 50px rgba(0,0,0,0.08)',
+          border: isDark
+            ? `1.5px solid ${alpha.white12}`
+            : `1.5px solid ${neutral.border}`,
+          boxShadow: `${softShadow(28, {
+            color: neutral.void,
+            strength: isDark ? 2.2 : 1.0,
+          })}, 0 0 42px ${rgbaOf(accentColor, isDark ? 0.16 : 0.08)}`,
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
@@ -95,36 +147,50 @@ export const ConversationalMockup: React.FC<ConversationalMockupProps> = ({
         {/* Chat Header */}
         <div
           style={{
-            padding: '16px 20px',
+            padding: '20px 28px',
             backgroundColor: isDark ? neutral.night : neutral.well,
-            borderBottom: isDark ? `1px solid ${alpha.white06}` : `1px solid ${neutral.border}`,
+            borderBottom: isDark
+              ? `1px solid ${alpha.white08}`
+              : `1px solid ${neutral.border}`,
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            gap: space.md,
           }}
         >
           <div
             style={{
-              width: 38,
-              height: 38,
-              borderRadius: '50%',
+              width: 46,
+              height: 46,
+              borderRadius: tokenRadius.pill,
               backgroundColor: accentColor,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: neutral.white,
-              fontWeight: 700,
-              fontSize: 16,
+              fontWeight: typography.weight.bold,
+              fontSize: 20,
             }}
           >
-            ✓
+            ✦
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <span style={{ fontSize: 15, fontWeight: 700, color: isDark ? neutral.white : neutral.ink }}>
-              Asistente Inteligente
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <span
+              style={{
+                fontSize: 22,
+                fontWeight: typography.weight.bold,
+                color: isDark ? neutral.white : neutral.ink,
+              }}
+            >
+              {resolvedAssistant}
             </span>
-            <span style={{ fontSize: 12, color: signal.green, fontWeight: 600 }}>
-              ● En línea • Respuesta instantánea
+            <span
+              style={{
+                fontSize: 16,
+                color: signal.green,
+                fontWeight: typography.weight.bold,
+              }}
+            >
+              {resolvedStatus}
             </span>
           </div>
         </div>
@@ -132,20 +198,20 @@ export const ConversationalMockup: React.FC<ConversationalMockupProps> = ({
         {/* Message Bubbles Area */}
         <div
           style={{
-            padding: '24px 20px',
+            padding: '28px 32px',
             display: 'flex',
             flexDirection: 'column',
-            gap: 16,
-            minHeight: 220,
+            gap: 20,
+            minHeight: 300,
             backgroundColor: isDark ? neutral.void : neutral.shell,
           }}
         >
           {chatMessages.map((msg, idx) => {
             const isUser = msg.sender === 'user';
             const msgSpring = spring({
-              frame: Math.max(0, f - (8 + idx * 16)),
+              frame: Math.max(0, f - (6 + idx * 14)),
               fps,
-              config: { damping: 13, stiffness: 110 },
+              config: { damping: 14, stiffness: 120 },
             });
 
             return (
@@ -153,33 +219,52 @@ export const ConversationalMockup: React.FC<ConversationalMockupProps> = ({
                 key={idx}
                 style={{
                   alignSelf: isUser ? 'flex-end' : 'flex-start',
-                  maxWidth: '82%',
-                  padding: '12px 18px',
-                  borderRadius: isUser ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                  maxWidth: '84%',
+                  padding: '16px 24px',
+                  borderRadius: isUser
+                    ? '22px 22px 6px 22px'
+                    : '22px 22px 22px 6px',
                   backgroundColor: isUser
                     ? accentColor
                     : isDark
                       ? neutral.aubergine
                       : neutral.white,
-                  color: isUser ? neutral.white : isDark ? neutral.paper : neutral.ink,
-                  fontSize: 15,
-                  lineHeight: 1.45,
-                  fontWeight: 500,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                  border: isUser
+                    ? 'none'
+                    : isDark
+                      ? `1px solid ${alpha.white08}`
+                      : `1px solid ${neutral.border}`,
+                  color: isUser
+                    ? neutral.white
+                    : isDark
+                      ? neutral.paper
+                      : neutral.ink,
+                  fontSize: 22,
+                  lineHeight: 1.4,
+                  fontWeight: typography.weight.medium,
+                  boxShadow: softShadow(8, {
+                    color: neutral.void,
+                    strength: isDark ? 1.4 : 0.6,
+                  }),
                   opacity: msgSpring,
-                  transform: `scale(${interpolate(msgSpring, [0, 1], [0.8, 1])}) translateY(${interpolate(msgSpring, [0, 1], [20, 0])}px)`,
+                  transform: `scale(${interpolate(
+                    msgSpring,
+                    [0, 1],
+                    [0.88, 1]
+                  )}) translateY(${interpolate(msgSpring, [0, 1], [20, 0])}px)`,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: 4,
+                  gap: 6,
                 }}
               >
                 <span>{msg.text}</span>
                 {msg.time && (
                   <span
                     style={{
-                      fontSize: 11,
-                      color: isUser ? alpha.white08 : neutral.textSubtle,
+                      fontSize: 15,
+                      color: isUser ? neutral.white : neutral.textSubtle,
                       alignSelf: 'flex-end',
+                      fontFamily: typography.monoFamily,
                     }}
                   >
                     {msg.time} {isUser && '✓✓'}
