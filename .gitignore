@@ -37,5 +37,7 @@ next-env.d.ts
 .env*
 !.env.example
 
-# Antigravity local agent state
-.agents/
+# Antigravity local agent state & external reference clones
+.agents/teamwork/
+/references/
+/scratch/

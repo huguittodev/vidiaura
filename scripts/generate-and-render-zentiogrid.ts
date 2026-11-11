@@ -1,10 +1,17 @@
-import * as dotenv from 'dotenv';
-dotenv.config({ path: '.env.local' });
 import * as fs from 'fs';
 import * as path from 'path';
 import { generateCreativeDirectorSceneGraph } from '../src/lib/ai/gemini-adapter';
 import { SceneGraphSchema } from '../src/lib/scene-graph/schema';
 import { execSync } from 'child_process';
+
+if (fs.existsSync('.env.local')) {
+  for (const line of fs.readFileSync('.env.local', 'utf8').split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+    if (match && process.env[match[1]] === undefined) {
+      process.env[match[1]] = match[2].replace(/^['"]|['"]$/g, '');
+    }
+  }
+}
 
 async function run() {
   console.log('--- GENERATING ZENTIOGRID VIDEO WITH VIDIAURA & GEMINI ---');
