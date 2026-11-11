@@ -45,6 +45,11 @@ import {
   BentoCascade,
   CropCalloutFocus,
   WhipPanScene,
+  LeadWordAssemble,
+  ChartLiveMoves,
+  TypeAndFilterFlow,
+  SteepTiltGlide,
+  PortalZoomHub,
   type TreeNode,
 } from '../motion-kit';
 
@@ -1268,6 +1273,71 @@ export const SceneNodeRenderer: React.FC<SceneNodeRendererProps> = ({
       );
     }
 
+    case 'lead_word_assemble': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <LeadWordAssemble
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'chart_live_moves': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <ChartLiveMoves
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'type_and_filter': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <TypeAndFilterFlow
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'steep_tilt_glide': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <SteepTiltGlide
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
+    case 'portal_zoom_hub': {
+      const hasTopCaption = Boolean(node.modifiers?.captionBar);
+      return (
+        <PortalZoomHub
+          payload={node.payload}
+          canvas={canvas}
+          accentColor={artDirection.primaryAccent}
+          isDark={artDirection.surfaceTheme === 'dark'}
+          hasTopCaption={hasTopCaption}
+        />
+      );
+    }
+
     default: {
       void node;
       return null;
@@ -1312,6 +1382,28 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
   const effectiveCameraTrack = activeSceneOwnsCamera
     ? NEUTRAL_CAMERA_TRACK
     : sceneGraph.cameraTrack;
+
+  // In SceneGraph v3, only render the root world-space SmartCursor during scenes that
+  // explicitly use the root cursorTrack (product_interaction_3d, synthetic_hero_button,
+  // synthetic_prompt_box, synthetic_connect_pills). Non-interactive motion-graphics atoms
+  // (and atoms like type_and_filter that own their own local cursor) never show a stray root cursor.
+  const ROOT_CURSOR_SCENE_TYPES = new Set([
+    'product_interaction_3d',
+    'synthetic_hero_button',
+    'synthetic_prompt_box',
+    'synthetic_connect_pills',
+  ]);
+  const showRootCursor =
+    sceneGraph.cursorTrack.length > 0 &&
+    (sceneGraph.version !== '3.0' ||
+      !sceneGraph.scenes ||
+      sceneGraph.scenes.length === 0 ||
+      sceneGraph.scenes.some(
+        (s) =>
+          frame >= s.startFrame &&
+          frame < s.startFrame + s.durationInFrames &&
+          ROOT_CURSOR_SCENE_TYPES.has(s.type)
+      ));
 
   return (
     <div
@@ -1439,6 +1531,7 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
         )}
       {/* Cursor lives in world space (inside the camera rig) so it stays glued to the
           buttons of the recording while the camera zooms and pans. */}
+      {showRootCursor && (
         <SmartCursor
           frame={frame}
           cursorTrack={sceneGraph.cursorTrack}
@@ -1449,6 +1542,7 @@ export const InteractiveSurfaceDemo: React.FC<InteractiveSurfaceDemoProps> = ({
           accentColor={sceneGraph.artDirection.primaryAccent}
           showRipple={true}
         />
+      )}
       </CameraRig>
 
 

@@ -148,12 +148,27 @@ export const AudioEngine: React.FC<AudioEngineProps> = ({
 
   if (!enabled) return null;
 
-  // Prepare SFX metadata for dynamic ducking calculation
-  const sfxDuckingMeta = timeline.sfxCues.map((c) => ({
-    startFrame: c.startFrame,
-    durationInFrames: c.durationInFrames,
-    priority: c.duckingPriority,
-  }));
+  // Prepare SFX metadata for dynamic ducking calculation:
+  // Window ducking around the acoustic peak of each priority-2 SFX cue (6-frame transient core)
+  // and use a gentle 0.78 (-2.1 dB) musical pocket so long risers/tails never squash the music bed.
+  const effectiveMixerOptions: MixerConfig = {
+    headroomCeiling: mixerOptions?.headroomCeiling ?? 0.95,
+    kneeThreshold: mixerOptions?.kneeThreshold ?? 0.82,
+    duckingFloor: mixerOptions?.duckingFloor ?? 0.78,
+    duckingAttackFrames: mixerOptions?.duckingAttackFrames ?? 2,
+    duckingReleaseFrames: mixerOptions?.duckingReleaseFrames ?? 6,
+  };
+
+  const sfxDuckingMeta = timeline.sfxCues.map((c) => {
+    const peakLag = SFX_CATALOG[c.asset]?.samplePeakLagFrames ?? 1;
+    const transientStart = c.startFrame + Math.max(0, peakLag - 2);
+    const transientDur = Math.min(6, Math.max(3, c.durationInFrames));
+    return {
+      startFrame: transientStart,
+      durationInFrames: transientDur,
+      priority: c.duckingPriority,
+    };
+  });
 
   // Helper to compute effective volume at any given frame
   const computeMasterLimitedVolume = (
@@ -161,11 +176,10 @@ export const AudioEngine: React.FC<AudioEngineProps> = ({
     cue: ScheduledCue
   ): number => {
     // 1. Nominal gain with fade + studio presence calibration
-    // ambient-beat.wav is synthesized at -21.72 dBFS RMS; boosting music carrier by 1.9x
-    // brings integrated program loudness from -23 LUFS into the -15.5 to -16.5 LUFS web target.
+    // ambient-beat.wav has intrinsic RMS -21.72 dBFS and Peak -4.12 dBFS (0.622 linear).
     const calibratedTargetVolume = cue.isMusic
-      ? Math.min(0.86, cue.volume * 1.9)
-      : Math.min(0.95, cue.volume * 1.15);
+      ? Math.min(0.95, Math.max(0.86, cue.volume * 2.25))
+      : Math.min(0.95, cue.volume * 1.24);
 
     const fadeConf: FadeConfig = {
       durationInFrames: cue.durationInFrames,
@@ -183,35 +197,39 @@ export const AudioEngine: React.FC<AudioEngineProps> = ({
 
     // Calculate ducking multiplier
     const duckingMultiplier = cue.isMusic
-      ? calculateDuckingFactor(targetFrame, sfxDuckingMeta, mixerOptions)
+      ? calculateDuckingFactor(targetFrame, sfxDuckingMeta, effectiveMixerOptions)
       : 1.0;
 
-    // Calculate envelope-weighted sum for master soft-knee limiter
-    let rawSum = 0;
+    // Quadrature acoustic peak envelope sum for transparent C^1 soft-knee limiting
+    // (uncorrelated audio sources sum in power sqrt(sum((g_i * wavPeak_i)^2)), avoiding false -6 dB over-compression)
+    let sumSq = 0;
     for (const c of activeCues) {
       if (c.isMusic) {
         const mGain = calculateFadeGain(targetFrame - c.startFrame, {
           durationInFrames: c.durationInFrames,
           fadeInFrames: c.fadeInFrames,
           fadeOutFrames: c.fadeOutFrames,
-          targetVolume: Math.min(0.86, c.volume * 1.9),
+          targetVolume: Math.min(0.95, Math.max(0.86, c.volume * 2.25)),
         });
-        const mDuck = calculateDuckingFactor(targetFrame, sfxDuckingMeta, mixerOptions);
-        rawSum += mGain * mDuck;
+        const mDuck = calculateDuckingFactor(targetFrame, sfxDuckingMeta, effectiveMixerOptions);
+        const effMusicPeak = mGain * mDuck * 0.68;
+        sumSq += effMusicPeak * effMusicPeak;
       } else {
         const relSfxFrame = Math.max(0, targetFrame - c.startFrame);
         const peakLag = SFX_CATALOG[c.asset]?.samplePeakLagFrames ?? 1;
         const distFromPeak = Math.abs(relSfxFrame - peakLag);
-        const decayConst = Math.max(3, c.durationInFrames * 0.42);
+        const decayConst = Math.max(2.5, c.durationInFrames * 0.28);
         const envWeight = Math.exp(-distFromPeak / decayConst);
-        rawSum += Math.min(0.95, c.volume * 1.15) * envWeight;
+        const effSfxPeak = Math.min(0.95, c.volume * 1.24) * envWeight * 0.78;
+        sumSq += effSfxPeak * effSfxPeak;
       }
     }
 
+    const quadratureSum = Math.sqrt(sumSq);
     const { limitFactor } = softLimitGain(
-      rawSum,
-      mixerOptions?.kneeThreshold,
-      mixerOptions?.headroomCeiling
+      quadratureSum,
+      effectiveMixerOptions.kneeThreshold,
+      effectiveMixerOptions.headroomCeiling
     );
 
     return Math.max(0, Math.min(0.95, baseGain * duckingMultiplier * limitFactor));
@@ -224,30 +242,40 @@ export const AudioEngine: React.FC<AudioEngineProps> = ({
 
   return (
     <>
-      {/* Background Music Track */}
+      {/* Background Music Track (Primary Carrier + Parallel Warm Body Bus for -16 LUFS Web Presence) */}
       {musicSrc && (
-        <Audio
-          src={musicSrc}
-          volume={(frameWithinAudio) => {
-            if (musicCue) {
-              return computeMasterLimitedVolume(frameWithinAudio, musicCue);
-            }
-            // Fallback for custom legacy music
-            const baseGain = calculateFadeGain(frameWithinAudio, {
-              durationInFrames,
-              fadeInFrames: music?.fadeInFrames ?? 15,
-              fadeOutFrames: music?.fadeOutFrames ?? 30,
-              targetVolume: music?.volume ?? 0.32,
-            });
-            const duck = calculateDuckingFactor(frameWithinAudio, sfxDuckingMeta, mixerOptions);
-            const { limitFactor } = softLimitGain(
-              baseGain * duck,
-              mixerOptions?.kneeThreshold,
-              mixerOptions?.headroomCeiling
-            );
-            return baseGain * duck * limitFactor;
-          }}
-        />
+        <>
+          <Audio
+            src={musicSrc}
+            volume={(frameWithinAudio) => {
+              if (musicCue) {
+                return computeMasterLimitedVolume(frameWithinAudio, musicCue);
+              }
+              const baseGain = calculateFadeGain(frameWithinAudio, {
+                durationInFrames,
+                fadeInFrames: music?.fadeInFrames ?? 15,
+                fadeOutFrames: music?.fadeOutFrames ?? 30,
+                targetVolume: Math.min(0.92, (music?.volume ?? 0.32) * 2.2),
+              });
+              const duck = calculateDuckingFactor(frameWithinAudio, sfxDuckingMeta, effectiveMixerOptions);
+              const { limitFactor } = softLimitGain(
+                baseGain * duck * 0.68,
+                effectiveMixerOptions.kneeThreshold,
+                effectiveMixerOptions.headroomCeiling
+              );
+              return Math.min(0.95, baseGain * duck * limitFactor);
+            }}
+          />
+          <Audio
+            src={musicSrc}
+            volume={(frameWithinAudio) => {
+              if (musicCue) {
+                return computeMasterLimitedVolume(frameWithinAudio, musicCue) * 0.46;
+              }
+              return 0;
+            }}
+          />
+        </>
       )}
 
       {/* Frame-Accurate SFX Sequences */}

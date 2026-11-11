@@ -350,6 +350,99 @@ export interface WhipPanPayload {
 }
 
 /* ========================================================================= */
+/* Phase 2 (Shotcraft Top 25 — Batch 2) Reusable Atom Payloads               */
+/* ========================================================================= */
+
+export interface LeadWordAssemblePayload {
+  eyebrow?: string;
+  leadWord: string;
+  trailingWords: string[];
+  highlightWord?: string;
+  subheadline?: string;
+  cyclingPills?: string[];
+  crashZoomOut?: boolean;
+}
+
+export interface ChartSecondaryReadout {
+  label: string;
+  value: string;
+  unit?: string;
+  provenance?: MetricProvenance;
+}
+
+export interface ChartLiveMovesPayload {
+  eyebrow?: string;
+  headline: string;
+  primaryMetricValue: string;
+  primaryMetricUnit?: string;
+  primaryMetricLabel: string;
+  provenance?: MetricProvenance;
+  burstTagLabel?: string;
+  secondaryReadouts?: ChartSecondaryReadout[];
+  mediaUrl?: string;
+  seriesSeed?: number;
+}
+
+export interface TypeAndFilterCardItem {
+  id: string;
+  title: string;
+  category: string;
+  subtitle: string;
+  badge?: string;
+  mediaUrl?: string;
+  accentColor?: string;
+}
+
+export interface TypeAndFilterPayload {
+  eyebrow?: string;
+  headline: string;
+  searchPlaceholder?: string;
+  searchQuery: string;
+  targetCardId: string;
+  mediaUrl?: string;
+  cards: TypeAndFilterCardItem[];
+}
+
+export interface SteepTiltGlideWidget {
+  id: string;
+  title: string;
+  category: string;
+  detail: string;
+  badge?: string;
+  accentColor?: string;
+}
+
+export interface SteepTiltGlidePayload {
+  eyebrow?: string;
+  headline: string;
+  subheadline?: string;
+  surfaceTitle?: string;
+  mediaUrl?: string;
+  secondaryMediaUrl?: string;
+  tiltAngleDeg?: number;
+  glideDistancePx?: number;
+  widgets: SteepTiltGlideWidget[];
+}
+
+export interface PortalHubNodeItem {
+  id: string;
+  label: string;
+  detail?: string;
+  iconKind?: 'capture' | 'code' | 'recipe' | 'music' | 'sfx';
+  accentColor?: string;
+}
+
+export interface PortalZoomHubPayload {
+  eyebrow?: string;
+  workspaceTitle: string;
+  portalCardTitle: string;
+  hubHeadline: string;
+  hubSubheadline?: string;
+  mediaUrl?: string;
+  nodes: PortalHubNodeItem[];
+}
+
+/* ========================================================================= */
 /* Layers 2–5: Composable Shot Descriptors (SceneGraph v3)                   */
 /* ========================================================================= */
 
@@ -378,7 +471,9 @@ export type CameraRecipeMode =
   | 'dolly-push-in'
   | 'isometric-tilt-reveal'
   | 'orbit-drift'
-  | 'whip-pan';
+  | 'whip-pan'
+  | 'steep-tilt-glide'
+  | 'crash-zoom-punch';
 
 export interface CameraDofConfig {
   focusY: number;
@@ -454,7 +549,9 @@ export type TransitionType =
   | 'hard-cut'
   | 'flash-cut'
   | 'whip-pan-brake'
-  | 'portal-zoom-wipe';
+  | 'portal-zoom-wipe'
+  | 'card-flip-reveal'
+  | 'iris-portal-wipe';
 
 export interface SceneTransition {
   type: TransitionType;
@@ -595,6 +692,31 @@ export interface WhipPanSceneNode extends BaseSceneNode {
   payload: WhipPanPayload;
 }
 
+export interface LeadWordAssembleSceneNode extends BaseSceneNode {
+  type: 'lead_word_assemble';
+  payload: LeadWordAssemblePayload;
+}
+
+export interface ChartLiveMovesSceneNode extends BaseSceneNode {
+  type: 'chart_live_moves';
+  payload: ChartLiveMovesPayload;
+}
+
+export interface TypeAndFilterSceneNode extends BaseSceneNode {
+  type: 'type_and_filter';
+  payload: TypeAndFilterPayload;
+}
+
+export interface SteepTiltGlideSceneNode extends BaseSceneNode {
+  type: 'steep_tilt_glide';
+  payload: SteepTiltGlidePayload;
+}
+
+export interface PortalZoomHubSceneNode extends BaseSceneNode {
+  type: 'portal_zoom_hub';
+  payload: PortalZoomHubPayload;
+}
+
 /**
  * Discriminated union of all supported scene types.
  */
@@ -615,7 +737,12 @@ export type SceneNode =
   | MaskRevealSceneNode
   | BentoCascadeSceneNode
   | CropCalloutSceneNode
-  | WhipPanSceneNode;
+  | WhipPanSceneNode
+  | LeadWordAssembleSceneNode
+  | ChartLiveMovesSceneNode
+  | TypeAndFilterSceneNode
+  | SteepTiltGlideSceneNode
+  | PortalZoomHubSceneNode;
 
 export type SceneGraphVersion = '2.0' | '3.0';
 

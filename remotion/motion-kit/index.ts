@@ -21,3 +21,4 @@ export * from './PageCam25D';
 export * from './SpotlightSweep';
 export * from './ShotcraftSceneComposer';
 export * from './ShotcraftBatch1Atoms';
+export * from './ShotcraftBatch2Atoms';

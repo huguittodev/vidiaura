@@ -77,6 +77,8 @@ export interface ResolvedCalloutBox {
   topPx: number;
   widthPx: number;
   minHeightPx: number;
+  anchorX: number;
+  anchorY: number;
 }
 
 /**
@@ -128,6 +130,18 @@ export function buildDefaultRecipeKeys(
         { frame: 0, cx: cxMid * 0.72, cy: cyMid, zoom: 1.1, rotX: 3, rotY: -12, rotZ: 0, persp: 1380 },
         { frame: Math.min(18, Math.round(end * 0.3)), cx: cxMid, cy: cyMid, zoom: 1.04, rotX: 1, rotY: 0, rotZ: 0, persp: 1450 },
         { frame: end, cx: cxMid, cy: cyMid, zoom: 1.08, rotX: 0, rotY: 0, rotZ: 0, persp: 1450 },
+      ];
+    case 'steep-tilt-glide':
+      return [
+        { frame: 0, cx: cxMid * 0.9, cy: cyMid * 1.02, zoom: 1.06, rotX: 14, rotY: -22, rotZ: -2, persp: 1280 },
+        { frame: Math.round(end * 0.55), cx: cxMid, cy: cyMid, zoom: 1.14, rotX: 10, rotY: -14, rotZ: -1, persp: 1350 },
+        { frame: end, cx: cxMid * 1.05, cy: cyMid * 0.98, zoom: 1.1, rotX: 6, rotY: -8, rotZ: 0, persp: 1420 },
+      ];
+    case 'crash-zoom-punch':
+      return [
+        { frame: 0, cx: cxMid, cy: cyMid, zoom: 1.0, rotX: 2, rotY: 0, rotZ: 0, persp: 1450 },
+        { frame: Math.min(14, Math.round(end * 0.22)), cx: cxMid, cy: cyMid * 0.96, zoom: 1.24, rotX: 5, rotY: -4, rotZ: 0, persp: 1380 },
+        { frame: end, cx: cxMid, cy: cyMid, zoom: 1.12, rotX: 2, rotY: 0, rotZ: 0, persp: 1450 },
       ];
     case 'page-cam-2.5d':
     case 'track':
@@ -304,19 +318,33 @@ export function computeCameraFrustumSafeBounds(
 
 /**
  * Resolves clamped, non-overlapping page-space positions for all `CropCallout` cards in a scene.
- * Works across both 16:9 landscape and 9:16 vertical canvases.
+ * Also pushes callout cards into the peripheral margin ring outside the central UI focal zone
+ * so floating callouts never occlude primary interface content, while recording `(anchorX, anchorY)`
+ * for leader-line rendering. Works across both 16:9 landscape and 9:16 vertical canvases.
  */
 export function resolveCalloutPositions(
   callouts: CropCallout[],
   cam: PageCam25DTransformResult,
   viewport: { width: number; height: number } = { width: 1920, height: 1080 },
-  options?: { hasCaptionBar?: boolean }
+  options?: {
+    hasCaptionBar?: boolean;
+    avoidFocalZone?: boolean;
+  }
 ): Map<string, ResolvedCalloutBox> {
   const result = new Map<string, ResolvedCalloutBox>();
   if (callouts.length === 0) return result;
 
   const isVertical = viewport.width < viewport.height;
   const topClearancePx = options?.hasCaptionBar ? 74 : 16;
+  const avoidFocalZone = options?.avoidFocalZone ?? true;
+
+  // Protected central UI focal region where hero cards/text live
+  const focalZone = {
+    left: Math.round(viewport.width * (isVertical ? 0.14 : 0.22)),
+    right: Math.round(viewport.width * (isVertical ? 0.86 : 0.78)),
+    top: Math.round(viewport.height * (isVertical ? 0.22 : 0.25)),
+    bottom: Math.round(viewport.height * (isVertical ? 0.68 : 0.72)),
+  };
 
   const placed: ResolvedCalloutBox[] = [];
 
@@ -335,8 +363,11 @@ export function resolveCalloutPositions(
     const naturalMinH = hasBothMetricAndSub ? 156 : 132;
     const minHeightPx = Math.max(c.height ?? naturalMinH, naturalMinH);
 
-    const rawLeft = Math.round(c.x * viewport.width - widthPx / 2);
-    const rawTop = Math.round(c.y * viewport.height - minHeightPx / 2);
+    const anchorX = Math.round(c.x * viewport.width);
+    const anchorY = Math.round(c.y * viewport.height);
+
+    const rawLeft = Math.round(anchorX - widthPx / 2);
+    const rawTop = Math.round(anchorY - minHeightPx / 2);
 
     let leftPx = Math.max(
       frustum.minX,
@@ -346,6 +377,50 @@ export function resolveCalloutPositions(
       frustum.minY,
       Math.min(frustum.maxY - minHeightPx, rawTop)
     );
+
+    // Push callout out of the central UI focal zone into the nearest peripheral dock
+    // so callouts highlight rather than cover important UI cards/headlines.
+    if (avoidFocalZone) {
+      const overlapsFocalX =
+        leftPx < focalZone.right && leftPx + widthPx > focalZone.left;
+      const overlapsFocalY =
+        topPx < focalZone.bottom && topPx + minHeightPx > focalZone.top;
+
+      if (overlapsFocalX && overlapsFocalY) {
+        // Prefer right-side and bottom peripheral docks so callouts never cover top-left scene headlines
+        const dockCandidates: Array<{ l: number; t: number; dist: number }> = [
+          // Top-right peripheral dock (primary landscape dock)
+          {
+            l: Math.max(frustum.minX, frustum.maxX - widthPx - 8),
+            t: frustum.minY + (isVertical ? 48 : 8),
+            dist: 0,
+          },
+          // Bottom-right peripheral dock (primary vertical & secondary landscape dock)
+          {
+            l: Math.max(frustum.minX, frustum.maxX - widthPx - 8),
+            t: Math.max(frustum.minY, frustum.maxY - minHeightPx - 8),
+            dist: 0,
+          },
+          // Bottom-left peripheral dock
+          {
+            l: frustum.minX + 8,
+            t: Math.max(frustum.minY, frustum.maxY - minHeightPx - 8),
+            dist: 0,
+          },
+        ].map((cand, idx) => ({
+          ...cand,
+          // In 16:9, prefer Top-Right (idx 0) away from left-aligned headlines;
+          // in 9:16 vertical, prefer Bottom-Right (idx 1) away from full-width top headers.
+          dist:
+            Math.hypot(cand.l - leftPx, cand.t - topPx) +
+            (isVertical ? (idx === 1 ? -260 : 180) : idx === 2 ? 120 : 0),
+        }));
+
+        dockCandidates.sort((a, b) => a.dist - b.dist);
+        leftPx = dockCandidates[0].l;
+        topPx = dockCandidates[0].t;
+      }
+    }
 
     // Deterministic collision resolution against already-placed callouts
     const gap = 20;
@@ -386,6 +461,8 @@ export function resolveCalloutPositions(
       topPx,
       widthPx,
       minHeightPx,
+      anchorX,
+      anchorY,
     };
     placed.push(box);
     result.set(c.id, box);

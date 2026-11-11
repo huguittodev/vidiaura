@@ -422,6 +422,51 @@ export const ShotTransitionOverlay: React.FC<{
     );
   }
 
+  if (transition.type === 'card-flip-reveal') {
+    const p = ramp(localFrame, 0, dur, EASE.snappy);
+    const beamOpacity = interpolate(localFrame, [0, dur * 0.45, dur], [0, 0.92, 0], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    });
+    const sweepX = mix(-42, 42, p);
+    return (
+      <AbsoluteFill
+        style={{
+          pointerEvents: 'none',
+          zIndex: 60,
+          opacity: beamOpacity,
+          transform: `translateX(${sweepX.toFixed(1)}%) scaleX(${(1.2 - Math.abs(p - 0.5) * 1.4).toFixed(2)})`,
+          background:
+            `linear-gradient(90deg, transparent 22%, ${rgbaOf(accentColor, 0.55)} 44%, ` +
+            `${rgbaOf(neutral.white, 0.94)} 50%, ${rgbaOf(accentColor, 0.55)} 56%, transparent 78%)`,
+          filter: 'blur(8px)',
+        }}
+      />
+    );
+  }
+
+  if (transition.type === 'iris-portal-wipe') {
+    const p = ramp(localFrame, 0, dur, EASE.swift);
+    const irisRadius = mix(12, 1480, p);
+    const irisAlpha = interpolate(localFrame, [0, dur * 0.55, dur], [0, 0.92, 0], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    });
+    return (
+      <AbsoluteFill
+        style={{
+          pointerEvents: 'none',
+          zIndex: 60,
+          opacity: irisAlpha,
+          background:
+            `radial-gradient(circle ${irisRadius.toFixed(0)}px at 50% 50%, ` +
+            `${rgbaOf(neutral.white, 0.26)} 0%, transparent 56%, ` +
+            `${rgbaOf(accentColor, 0.85)} 74%, ${rgbaOf(brand.obsidian, 0.96)} 100%)`,
+        }}
+      />
+    );
+  }
+
   // portal-zoom-wipe
   const p = ramp(localFrame, 0, dur, EASE.snappy);
   const ringRadius = mix(40, 1400, p);

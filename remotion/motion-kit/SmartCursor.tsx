@@ -98,11 +98,39 @@ export const SmartCursor: React.FC<SmartCursorProps> = ({
       ];
     }
 
-    return [{ frame: 0, x: 0.5, y: 0.5 }];
+    return [];
   }, [cursorTrack, track, start, target, startFrame, endFrame, clickFrame]);
+
+  if (effectiveTrack.length === 0) {
+    return null;
+  }
 
   // Interpolate state along Bezier path
   const state = interpolateCursorTrack(effectiveTrack, frame);
+
+  // Active interaction window envelope: fade in before first keyframe, fade out after last keyframe
+  const firstFrame = effectiveTrack[0].frame;
+  const lastFrame = effectiveTrack[effectiveTrack.length - 1].frame;
+  const windowFadeIn =
+    firstFrame <= 0
+      ? 1
+      : interpolate(frame, [firstFrame - 12, firstFrame], [0, 1], {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        });
+  const windowFadeOut = interpolate(
+    frame,
+    [lastFrame + 8, lastFrame + 20],
+    [1, 0],
+    {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    }
+  );
+  const windowEnvelope = windowFadeIn * windowFadeOut;
+  if (windowEnvelope <= 0.01) {
+    return null;
+  }
 
   // Click physics: scale compression [1, 0.92, 1]
   let clickScale = 1.0;
@@ -135,10 +163,16 @@ export const SmartCursor: React.FC<SmartCursorProps> = ({
 
   // Smooth parking fade: cursor fades out when parked in the periphery (>= 0.92)
   const parkCoord = Math.min(state.x, state.y);
-  const cursorOpacity = interpolate(parkCoord, [0.88, 0.94], [1, 0], {
-    extrapolateLeft: 'clamp',
-    extrapolateRight: 'clamp',
-  });
+  const cursorOpacity =
+    windowEnvelope *
+    interpolate(parkCoord, [0.88, 0.94], [1, 0], {
+      extrapolateLeft: 'clamp',
+      extrapolateRight: 'clamp',
+    });
+
+  if (cursorOpacity <= 0.01) {
+    return null;
+  }
 
   return (
     <CursorPointer

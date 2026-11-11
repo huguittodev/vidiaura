@@ -386,6 +386,99 @@ export const WhipPanPayloadSchema = z.object({
 });
 
 /* ========================================================================= */
+/* Phase 2 (Shotcraft Top 25 — Batch 2) Reusable Atom Payloads               */
+/* ========================================================================= */
+
+export const LeadWordAssemblePayloadSchema = z.object({
+  eyebrow: z.string().max(60).optional(),
+  leadWord: z.string().min(1).max(32),
+  trailingWords: z.array(z.string().min(1).max(36)).min(1).max(8),
+  highlightWord: z.string().max(36).optional(),
+  subheadline: z.string().max(140).optional(),
+  cyclingPills: z.array(z.string().min(1).max(40)).max(6).optional(),
+  crashZoomOut: z.boolean().optional(),
+});
+
+export const ChartSecondaryReadoutSchema = z.object({
+  label: z.string().min(1).max(50),
+  value: z.string().min(1).max(24),
+  unit: z.string().max(16).optional(),
+  provenance: MetricProvenanceSchema.optional(),
+});
+
+export const ChartLiveMovesPayloadSchema = z.object({
+  eyebrow: z.string().max(60).optional(),
+  headline: z.string().min(1).max(90),
+  primaryMetricValue: z.string().min(1).max(24),
+  primaryMetricUnit: z.string().max(24).optional(),
+  primaryMetricLabel: z.string().min(1).max(60),
+  provenance: MetricProvenanceSchema.optional(),
+  burstTagLabel: z.string().max(40).optional(),
+  secondaryReadouts: z.array(ChartSecondaryReadoutSchema).max(4).optional(),
+  mediaUrl: z.string().optional(),
+  seriesSeed: z.number().int().optional(),
+});
+
+export const TypeAndFilterCardItemSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1).max(60),
+  category: z.string().min(1).max(36),
+  subtitle: z.string().min(1).max(110),
+  badge: z.string().max(30).optional(),
+  mediaUrl: z.string().optional(),
+  accentColor: z.string().regex(HexColorRegex).optional(),
+});
+
+export const TypeAndFilterPayloadSchema = z.object({
+  eyebrow: z.string().max(60).optional(),
+  headline: z.string().min(1).max(80),
+  searchPlaceholder: z.string().max(60).optional(),
+  searchQuery: z.string().min(1).max(48),
+  targetCardId: z.string().min(1),
+  mediaUrl: z.string().optional(),
+  cards: z.array(TypeAndFilterCardItemSchema).min(3).max(9),
+});
+
+export const SteepTiltGlideWidgetSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1).max(60),
+  category: z.string().min(1).max(36),
+  detail: z.string().min(1).max(110),
+  badge: z.string().max(30).optional(),
+  accentColor: z.string().regex(HexColorRegex).optional(),
+});
+
+export const SteepTiltGlidePayloadSchema = z.object({
+  eyebrow: z.string().max(60).optional(),
+  headline: z.string().min(1).max(80),
+  subheadline: z.string().max(120).optional(),
+  surfaceTitle: z.string().max(80).optional(),
+  mediaUrl: z.string().optional(),
+  secondaryMediaUrl: z.string().optional(),
+  tiltAngleDeg: z.number().min(-60).max(60).optional(),
+  glideDistancePx: z.number().min(200).max(2400).optional(),
+  widgets: z.array(SteepTiltGlideWidgetSchema).min(2).max(6),
+});
+
+export const PortalHubNodeItemSchema = z.object({
+  id: z.string().min(1),
+  label: z.string().min(1).max(40),
+  detail: z.string().max(80).optional(),
+  iconKind: z.enum(['capture', 'code', 'recipe', 'music', 'sfx']).optional(),
+  accentColor: z.string().regex(HexColorRegex).optional(),
+});
+
+export const PortalZoomHubPayloadSchema = z.object({
+  eyebrow: z.string().max(60).optional(),
+  workspaceTitle: z.string().min(1).max(70),
+  portalCardTitle: z.string().min(1).max(60),
+  hubHeadline: z.string().min(1).max(80),
+  hubSubheadline: z.string().max(120).optional(),
+  mediaUrl: z.string().optional(),
+  nodes: z.array(PortalHubNodeItemSchema).min(3).max(6),
+});
+
+/* ========================================================================= */
 /* Layers 2–5: Composable Shot Descriptors (SceneGraph v3)                   */
 /* ========================================================================= */
 
@@ -416,6 +509,8 @@ export const CameraRecipeModeSchema = z.enum([
   'isometric-tilt-reveal',
   'orbit-drift',
   'whip-pan',
+  'steep-tilt-glide',
+  'crash-zoom-punch',
 ]);
 
 export const CameraDofConfigSchema = z.object({
@@ -513,6 +608,8 @@ export const TransitionTypeSchema = z.enum([
   'flash-cut',
   'whip-pan-brake',
   'portal-zoom-wipe',
+  'card-flip-reveal',
+  'iris-portal-wipe',
 ]);
 
 export const SceneTransitionSchema = z.object({
@@ -665,6 +762,32 @@ export const SceneNodeSchema = z.discriminatedUnion('type', [
     ...baseSceneFields,
     type: z.literal('whip_pan'),
     payload: WhipPanPayloadSchema,
+  }),
+  // Phase 2 (Shotcraft Top 25 — Batch 2) Reusable Scene Atoms
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('lead_word_assemble'),
+    payload: LeadWordAssemblePayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('chart_live_moves'),
+    payload: ChartLiveMovesPayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('type_and_filter'),
+    payload: TypeAndFilterPayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('steep_tilt_glide'),
+    payload: SteepTiltGlidePayloadSchema,
+  }),
+  z.object({
+    ...baseSceneFields,
+    type: z.literal('portal_zoom_hub'),
+    payload: PortalZoomHubPayloadSchema,
   }),
 ]);
 
@@ -830,6 +953,25 @@ export const SceneGraphSchema = z
             'metricValue',
           ]);
         });
+      }
+      if (sc.type === 'chart_live_moves') {
+        checkMetricProvenance(
+          sc.payload.primaryMetricValue,
+          sc.payload.provenance,
+          ['scenes', sIdx, 'payload', 'primaryMetricValue']
+        );
+        if (sc.payload.secondaryReadouts) {
+          sc.payload.secondaryReadouts.forEach((sr, srIdx) => {
+            checkMetricProvenance(sr.value, sr.provenance, [
+              'scenes',
+              sIdx,
+              'payload',
+              'secondaryReadouts',
+              srIdx,
+              'value',
+            ]);
+          });
+        }
       }
     });
   });

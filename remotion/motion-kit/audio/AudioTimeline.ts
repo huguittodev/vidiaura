@@ -506,6 +506,46 @@ export function compileSceneAutoSfx(params: {
                 { id: 'whip-ticks', frame: 10, event: 'rapid-batch-tick' as const, burstCount: 4, burstIntervalFrames: 4 },
                 { id: 'whip-lock', frame: Math.min(54, Math.floor(scene.durationInFrames * 0.65)), event: 'cta-chime' as const, volume: 0.68 },
               ];
+            case 'lead_word_assemble': {
+              const slotCount = Math.min(5, scene.payload.cyclingPills?.length ?? 3);
+              return [
+                { id: 'lead-zoom', frame: 4, event: 'spotlight-whoosh' as const, volume: 0.66 },
+                { id: 'lead-slam', frame: 14, event: 'hero-slam' as const, volume: 0.72 },
+                { id: 'lead-slots', frame: 24, event: 'rapid-batch-tick' as const, burstCount: slotCount, burstIntervalFrames: 12 },
+              ];
+            }
+            case 'chart_live_moves': {
+              const kpiCount = Math.min(4, scene.payload.secondaryReadouts?.length ?? 3);
+              return [
+                { id: 'chart-sweep', frame: 6, event: 'spotlight-whoosh' as const, volume: 0.58 },
+                { id: 'chart-kpis', frame: 16, event: 'rapid-batch-tick' as const, burstCount: kpiCount, burstIntervalFrames: 5 },
+                { id: 'chart-anomaly', frame: Math.min(52, Math.floor(scene.durationInFrames * 0.6)), event: 'metric-roll' as const, volume: 0.62 },
+              ];
+            }
+            case 'type_and_filter': {
+              const queryLen = Math.min(12, Math.max(4, Math.ceil((scene.payload.searchQuery?.length ?? 14) / 2)));
+              return [
+                { id: 'filter-focus', frame: 6, event: 'ui-card-pop' as const, volume: 0.56 },
+                { id: 'filter-typing', frame: 10, event: 'rapid-batch-tick' as const, burstCount: queryLen, burstIntervalFrames: 3 },
+                { id: 'filter-click', frame: Math.min(56, Math.floor(scene.durationInFrames * 0.66)), event: 'metric-roll' as const, volume: 0.68 },
+              ];
+            }
+            case 'steep_tilt_glide': {
+              const widgetCount = Math.min(4, scene.payload.widgets?.length ?? 3);
+              return [
+                { id: 'glide-entry', frame: 6, event: 'spotlight-whoosh' as const, volume: 0.64 },
+                { id: 'glide-widgets', frame: 16, event: 'rapid-batch-tick' as const, burstCount: widgetCount, burstIntervalFrames: 5 },
+                { id: 'glide-lock', frame: Math.min(54, Math.floor(scene.durationInFrames * 0.64)), event: 'sheen-shimmer' as const, volume: 0.56 },
+              ];
+            }
+            case 'portal_zoom_hub': {
+              const nodeCount = Math.min(6, scene.payload.nodes?.length ?? 4);
+              return [
+                { id: 'portal-expand', frame: 8, event: 'spotlight-whoosh' as const, volume: 0.66 },
+                { id: 'portal-nodes', frame: 24, event: 'rapid-batch-tick' as const, burstCount: nodeCount, burstIntervalFrames: 4 },
+                { id: 'portal-lock', frame: Math.min(58, Math.floor(scene.durationInFrames * 0.68)), event: 'cta-chime' as const, volume: 0.68 },
+              ];
+            }
             default:
               return [];
           }
@@ -582,7 +622,8 @@ export function compileSceneAutoSfx(params: {
         const transAsset: AudioAsset =
           scene.transitionOut.type === 'flash-cut'
             ? 'sub-bass-drop'
-            : scene.transitionOut.type === 'portal-zoom-wipe'
+            : scene.transitionOut.type === 'portal-zoom-wipe' ||
+                scene.transitionOut.type === 'iris-portal-wipe'
               ? 'transition-whoosh-heavy'
               : 'transition-whoosh-fast';
         const transFrame = sfxFrom(

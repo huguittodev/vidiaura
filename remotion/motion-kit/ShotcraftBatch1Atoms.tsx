@@ -100,7 +100,7 @@ const VIDI_PALETTES = {
 
 const withAlpha = rgbaOf;
 
-function resolveMediaAssetSrc(rawUrl: string): string {
+export function resolveMediaAssetSrc(rawUrl: string): string {
   if (
     rawUrl.startsWith('http://') ||
     rawUrl.startsWith('https://') ||
@@ -112,6 +112,97 @@ function resolveMediaAssetSrc(rawUrl: string): string {
   const clean = rawUrl.startsWith('/') ? rawUrl.slice(1) : rawUrl;
   return staticFile(clean);
 }
+
+/**
+ * Adaptive Media Surface for arbitrary real PNG/JPG/WebP/SVG captures of any aspect ratio
+ * (e.g. 3840x3492 tall full-page captures, 320x647 vertical sidebars, 1728x1080 16:10 windows).
+ * Combines a soft-blurred ambient backdrop fill (`objectFit: 'cover'`) with a crisp
+ * non-cropping foreground capture (`objectFit: 'contain'`) so UI headers and sidebars are never cut off.
+ */
+export const AdaptiveMediaSurface: React.FC<{
+  mediaUrl: string;
+  isDark: boolean;
+  accentColor: string;
+  fitMode?: 'contain' | 'cover';
+  scrollProgress?: number;
+  style?: React.CSSProperties;
+}> = ({
+  mediaUrl,
+  isDark,
+  accentColor,
+  fitMode = 'contain',
+  scrollProgress = 0,
+  style,
+}) => {
+  const src = resolveMediaAssetSrc(mediaUrl);
+  const palette = isDark ? VIDI_PALETTES.dark : VIDI_PALETTES.light;
+  const clampedScroll = Math.max(0, Math.min(1, scrollProgress));
+
+  return (
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        backgroundColor: isDark ? palette.bgPrimary : palette.surfaceSubtle,
+        ...style,
+      }}
+    >
+      {/* Ambient blurred fill eliminating dead letterbox/pillarbox bars for non-16:9 captures */}
+      <Img
+        src={src}
+        style={{
+          position: 'absolute',
+          inset: -16,
+          width: 'calc(100% + 32px)',
+          height: 'calc(100% + 32px)',
+          objectFit: 'cover',
+          filter: 'blur(22px)',
+          opacity: isDark ? 0.28 : 0.22,
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Subtle radial keylight tint */}
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: `radial-gradient(circle at 50% 40%, ${withAlpha(
+            accentColor,
+            isDark ? 0.12 : 0.06
+          )} 0%, transparent 72%)`,
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Sharp foreground capture preserving full UI hierarchy */}
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          padding: fitMode === 'contain' ? 12 : 0,
+          boxSizing: 'border-box',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Img
+          src={src}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: fitMode,
+            objectPosition: `50% ${(clampedScroll * 100).toFixed(1)}%`,
+            borderRadius: fitMode === 'contain' ? VIDI_RADII.lg : 0,
+            boxShadow: fitMode === 'contain' ? VIDI_SHADOWS.cardSubtle : undefined,
+          }}
+        />
+      </div>
+    </div>
+  );
+};
 
 /* ========================================================================= */
 /* 1. EXPLODED 2.5D UI (`exploded_25d_ui`)                                   */
@@ -242,9 +333,11 @@ export const Exploded25DUI: React.FC<Exploded25DUIProps> = ({
               backgroundColor: palette.bgSecondary,
             }}
           >
-            <Img
-              src={resolveMediaAssetSrc(payload.mediaUrl)}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            <AdaptiveMediaSurface
+              mediaUrl={payload.mediaUrl}
+              isDark={isDark}
+              accentColor={accentColor}
+              fitMode="contain"
             />
           </div>
         ) : (
@@ -1125,7 +1218,7 @@ export const BentoCascade: React.FC<BentoCascadeProps> = ({
   const safeTop = safe.y;
   const safeBottom = canvas.height - (safe.y + safe.height);
 
-  const topInset = safeTop + (hasTopCaption ? (isVertical ? 114 : 92) : 0);
+  const topInset = safeTop + (hasTopCaption ? (isVertical ? 164 : 92) : 0);
   const headerHeight = isVertical ? 110 : 96;
   const gridTop = topInset + headerHeight;
   const gridWidth = safe.width;
@@ -1445,7 +1538,7 @@ export const CropCalloutFocus: React.FC<CropCalloutFocusProps> = ({
   const safeTop = safe.y;
   const safeBottom = canvas.height - (safe.y + safe.height);
 
-  const topInset = safeTop + (hasTopCaption ? (isVertical ? 114 : 92) : 0);
+  const topInset = safeTop + (hasTopCaption ? (isVertical ? 164 : 92) : 0);
   const surfaceW = safe.width;
   const surfaceH = Math.max(400, canvas.height - topInset - safeBottom);
 
@@ -1591,256 +1684,350 @@ export const CropCalloutFocus: React.FC<CropCalloutFocusProps> = ({
           </div>
         </div>
 
-        {/* Underlying Product Surface (Real SVG/PNG Capture or Structured UI Grid) */}
-        <div style={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
-          {payload.mediaUrl ? (
-            <Img
-              src={resolveMediaAssetSrc(payload.mediaUrl)}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                opacity: isDark ? 0.82 : 0.9,
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                width: '100%',
-                height: '100%',
-                padding: isVertical ? 24 : 36,
-                display: 'grid',
-                gridTemplateColumns: isVertical ? '1fr' : 'repeat(3, 1fr)',
-                gap: 20,
-                opacity: 0.45,
-              }}
-            >
-              {payload.targets.map((t, i) => (
-                <div
-                  key={i}
-                  style={{
-                    borderRadius: VIDI_RADII.lg,
-                    border: `1px solid ${palette.surfaceBorder}`,
-                    backgroundColor: isDark ? palette.bgPrimary : palette.surfaceSubtle,
-                    padding: 20,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <span
+        {/* Split Non-Occluding Inspection Layout:
+            Zone A (UI Capture + Transparent HUD Reticles) + Zone B (Peripheral Callout Dock Rail) */}
+        <div
+          style={{
+            position: 'relative',
+            flex: 1,
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: isVertical ? 'column' : 'row',
+          }}
+        >
+          {/* ZONE A: Unoccluded Product Capture Viewport with Transparent HUD Reticles */}
+          <div
+            style={{
+              position: 'relative',
+              flex: isVertical ? '0 0 58%' : '0 0 64%',
+              height: isVertical ? '58%' : '100%',
+              overflow: 'hidden',
+              borderRight: isVertical ? undefined : `1px solid ${palette.surfaceBorder}`,
+              borderBottom: isVertical ? `1px solid ${palette.surfaceBorder}` : undefined,
+            }}
+          >
+            {payload.mediaUrl ? (
+              <AdaptiveMediaSurface
+                mediaUrl={payload.mediaUrl}
+                isDark={isDark}
+                accentColor={accentColor}
+                fitMode="contain"
+              />
+            ) : (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  padding: isVertical ? 20 : 28,
+                  display: 'grid',
+                  gridTemplateColumns: isVertical ? '1fr' : 'repeat(3, 1fr)',
+                  gap: 16,
+                  opacity: 0.55,
+                }}
+              >
+                {payload.targets.map((t, i) => (
+                  <div
+                    key={i}
                     style={{
-                      fontFamily: VIDI_TYPOGRAPHY.fontMono,
-                      fontSize: 13,
-                      color: palette.textSecondary,
+                      borderRadius: VIDI_RADII.lg,
+                      border: `1px solid ${palette.surfaceBorder}`,
+                      backgroundColor: isDark ? palette.bgPrimary : palette.surfaceSubtle,
+                      padding: 18,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
                     }}
                   >
-                    {t.head}
+                    <span
+                      style={{
+                        fontFamily: VIDI_TYPOGRAPHY.fontMono,
+                        fontSize: 13,
+                        color: palette.textSecondary,
+                      }}
+                    >
+                      {t.head}
+                    </span>
+                    <div
+                      style={{
+                        fontSize: 20,
+                        fontWeight: 700,
+                        color: palette.textPrimary,
+                      }}
+                    >
+                      {t.detail}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Laser Scanline + Trailing Dot-Matrix Band */}
+            {scanOpacity > 0.01 && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  top: scanY - 56,
+                  height: 58,
+                  opacity: scanOpacity,
+                  pointerEvents: 'none',
+                  zIndex: 12,
+                }}
+              >
+                <div
+                  style={{
+                    width: '100%',
+                    height: 56,
+                    backgroundImage: `radial-gradient(${withAlpha(accentColor, 0.42)} 1.5px, transparent 1.5px)`,
+                    backgroundSize: '12px 12px',
+                    maskImage: 'linear-gradient(180deg, transparent 0%, black 100%)',
+                    WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, black 100%)',
+                  }}
+                />
+                <div
+                  style={{
+                    width: '100%',
+                    height: 2.5,
+                    backgroundColor: accentColor,
+                    boxShadow: `0 0 18px ${accentColor}`,
+                  }}
+                />
+              </div>
+            )}
+
+            {/* Transparent HUD Reticle Boxes on the Capture (Zero UI Text Occlusion) */}
+            {targetsWithTrigger.map((t) => {
+              const localF = frame - t.triggerFrame;
+              if (localF < 0) return null;
+
+              const pop = spring({
+                frame: localF,
+                fps,
+                config: { damping: 15, stiffness: 210, mass: 0.75 },
+              });
+              const zoneW = isVertical ? surfaceW : surfaceW * 0.64;
+              const zoneH = isVertical ? (surfaceH - 60) * 0.58 : surfaceH - 60;
+              const retW = Math.max(96, Math.min(220, (t.width ?? 0.24) * zoneW));
+              const retH = Math.max(54, Math.min(110, (t.height ?? 0.14) * zoneH));
+              const retLeft = Math.max(
+                14,
+                Math.min(zoneW - retW - 14, t.x * zoneW - retW * 0.5)
+              );
+              const retTop = Math.max(
+                14,
+                Math.min(zoneH - retH - 14, t.y * zoneH - retH * 0.5)
+              );
+
+              return (
+                <div
+                  key={`reticle-${t.id}`}
+                  style={{
+                    position: 'absolute',
+                    left: retLeft,
+                    top: retTop,
+                    width: retW,
+                    height: retH,
+                    borderRadius: 10,
+                    backgroundColor: withAlpha(accentColor, 0.06),
+                    border: `1.5px dashed ${withAlpha(accentColor, 0.78)}`,
+                    boxShadow: `0 0 0 2px ${withAlpha(accentColor, 0.14)}`,
+                    transform: `scale(${(1.18 - 0.18 * pop).toFixed(4)})`,
+                    opacity: Math.min(1, localF / 4),
+                    pointerEvents: 'none',
+                    zIndex: 14,
+                  }}
+                >
+                  {/* 4 L-Corner HUD Brackets */}
+                  {[
+                    { top: -3, left: -3, borderTop: true, borderLeft: true },
+                    { top: -3, right: -3, borderTop: true, borderRight: true },
+                    { bottom: -3, left: -3, borderBottom: true, borderLeft: true },
+                    { bottom: -3, right: -3, borderBottom: true, borderRight: true },
+                  ].map((corner, cIdx) => (
+                    <span
+                      key={cIdx}
+                      style={{
+                        position: 'absolute',
+                        top: corner.top,
+                        bottom: corner.bottom,
+                        left: corner.left,
+                        right: corner.right,
+                        width: 11,
+                        height: 11,
+                        borderTop: corner.borderTop ? `2.5px solid ${accentColor}` : undefined,
+                        borderBottom: corner.borderBottom
+                          ? `2.5px solid ${accentColor}`
+                          : undefined,
+                        borderLeft: corner.borderLeft ? `2.5px solid ${accentColor}` : undefined,
+                        borderRight: corner.borderRight
+                          ? `2.5px solid ${accentColor}`
+                          : undefined,
+                      }}
+                    />
+                  ))}
+                  {/* Compact Index Tag on Corner */}
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: -12,
+                      left: 8,
+                      padding: '2px 8px',
+                      borderRadius: VIDI_RADII.pill,
+                      backgroundColor: accentColor,
+                      color: neutral.white,
+                      fontFamily: VIDI_TYPOGRAPHY.fontMono,
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: '0.06em',
+                    }}
+                  >
+                    0{t.idx + 1}
                   </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* ZONE B: Peripheral Callout Dock Rail (Never Occludes the Capture in Zone A) */}
+          <div
+            style={{
+              flex: 1,
+              padding: isVertical ? '14px 18px' : '18px 22px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: isVertical ? 10 : 14,
+              backgroundColor: isDark
+                ? withAlpha(palette.bgPrimary, 0.72)
+                : withAlpha(palette.surfaceSubtle, 0.78),
+              zIndex: 16,
+            }}
+          >
+            {targetsWithTrigger.map((t) => {
+              const localF = frame - t.triggerFrame;
+              const isLocked = localF >= 0;
+              const pop = isLocked
+                ? spring({
+                    frame: localF,
+                    fps,
+                    config: { damping: 15, stiffness: 210, mass: 0.75 },
+                  })
+                : 0;
+              const tagChars = isLocked
+                ? Math.min(t.head.length, Math.max(1, Math.floor((localF + 2) * 1.6)))
+                : 0;
+              const isDemo = t.provenance === 'demo-sample';
+
+              return (
+                <div
+                  key={t.id}
+                  style={{
+                    position: 'relative',
+                    padding: isVertical ? '12px 16px' : '14px 18px',
+                    borderRadius: VIDI_RADII.lg,
+                    backgroundColor: isDark
+                      ? withAlpha(palette.bgSecondary, 0.96)
+                      : withAlpha(palette.surfaceCard, 0.98),
+                    border: `1.5px solid ${
+                      isLocked ? withAlpha(accentColor, 0.78) : palette.surfaceBorder
+                    }`,
+                    boxShadow: isLocked ? VIDI_SHADOWS.cardElevated : VIDI_SHADOWS.cardSubtle,
+                    transform: `translateX(${((1 - pop) * 18).toFixed(2)}px) scale(${(
+                      0.94 +
+                      0.06 * pop
+                    ).toFixed(4)})`,
+                    opacity: isLocked ? Math.min(1, localF / 5 + 0.2) : 0.26,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 4,
+                  }}
+                >
                   <div
                     style={{
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: palette.textPrimary,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 8,
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <span
+                        style={{
+                          padding: '2px 7px',
+                          borderRadius: VIDI_RADII.pill,
+                          backgroundColor: withAlpha(accentColor, 0.18),
+                          color: accentColor,
+                          fontFamily: VIDI_TYPOGRAPHY.fontMono,
+                          fontSize: 11,
+                          fontWeight: 800,
+                        }}
+                      >
+                        0{t.idx + 1}
+                      </span>
+                      <span
+                        style={{
+                          fontFamily: VIDI_TYPOGRAPHY.fontMono,
+                          fontSize: 13,
+                          fontWeight: 700,
+                          letterSpacing: '0.07em',
+                          color: accentColor,
+                        }}
+                      >
+                        {isLocked ? t.head.slice(0, tagChars) : t.head}
+                      </span>
+                    </div>
+                    {isDemo && (
+                      <span
+                        style={{
+                          fontFamily: VIDI_TYPOGRAPHY.fontMono,
+                          fontSize: 11,
+                          fontWeight: 700,
+                          padding: '2px 8px',
+                          borderRadius: VIDI_RADII.pill,
+                          backgroundColor: withAlpha(palette.statusWarning, 0.18),
+                          color: palette.statusWarning,
+                        }}
+                      >
+                        DEMO SAMPLE
+                      </span>
+                    )}
+                  </div>
+
+                  {t.metricValue && (
+                    <div
+                      style={{
+                        fontSize: isVertical ? 24 : 26,
+                        fontWeight: 800,
+                        letterSpacing: '-0.025em',
+                        color: palette.textPrimary,
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      <DigitRoll
+                        value={t.metricValue}
+                        delay={t.triggerFrame + 2}
+                        fontSize={isVertical ? 24 : 26}
+                        color={palette.textPrimary}
+                        frame={frame}
+                      />
+                    </div>
+                  )}
+
+                  <div
+                    style={{
+                      fontSize: isVertical ? 14 : 15,
+                      fontWeight: 600,
+                      color: palette.textSecondary,
+                      lineHeight: 1.3,
                     }}
                   >
                     {t.detail}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-
-          {/* Laser Scanline + Trailing Dot-Matrix Band */}
-          {scanOpacity > 0.01 && (
-            <div
-              style={{
-                position: 'absolute',
-                left: 0,
-                right: 0,
-                top: scanY - 56,
-                height: 58,
-                opacity: scanOpacity,
-                pointerEvents: 'none',
-                zIndex: 12,
-              }}
-            >
-              <div
-                style={{
-                  width: '100%',
-                  height: 56,
-                  backgroundImage: `radial-gradient(${withAlpha(accentColor, 0.42)} 1.5px, transparent 1.5px)`,
-                  backgroundSize: '12px 12px',
-                  maskImage: 'linear-gradient(180deg, transparent 0%, black 100%)',
-                  WebkitMaskImage: 'linear-gradient(180deg, transparent 0%, black 100%)',
-                }}
-              />
-              <div
-                style={{
-                  width: '100%',
-                  height: 2.5,
-                  backgroundColor: accentColor,
-                  boxShadow: `0 0 18px ${accentColor}`,
-                }}
-              />
-            </div>
-          )}
-
-          {/* HUD Bracket Callout Locks */}
-          {targetsWithTrigger.map((t) => {
-            const localF = frame - t.triggerFrame;
-            if (localF < 0) return null;
-
-            const pop = spring({
-              frame: localF,
-              fps,
-              config: { damping: 15, stiffness: 210, mass: 0.75 },
-            });
-            const tagChars = Math.min(
-              t.head.length,
-              Math.max(0, Math.floor((localF - 2) * 1.4))
-            );
-            const isDemo = t.provenance === 'demo-sample';
-
-            // Keep callouts safely inside the inspection window in both 16:9 and 9:16
-            const cardW = isVertical
-              ? Math.min(340, surfaceW * 0.76)
-              : Math.min(380, surfaceW * 0.34);
-            const clampedLeft = Math.max(
-              24,
-              Math.min(surfaceW - cardW - 24, t.targetPxX - cardW * 0.5)
-            );
-            const slotBandH = Math.max(
-              125,
-              (surfaceH - 120) / Math.max(1, targetsWithTrigger.length)
-            );
-            const clampedTop = Math.max(
-              20,
-              Math.min(surfaceH - 180, 20 + t.idx * slotBandH)
-            );
-
-            return (
-              <div
-                key={t.id}
-                style={{
-                  position: 'absolute',
-                  left: clampedLeft,
-                  top: clampedTop,
-                  width: cardW,
-                  padding: '16px 20px',
-                  borderRadius: VIDI_RADII.lg,
-                  backgroundColor: isDark
-                    ? withAlpha(palette.bgPrimary, 0.94)
-                    : withAlpha(palette.surfaceCard, 0.96),
-                  border: `1.5px solid ${withAlpha(accentColor, 0.72)}`,
-                  boxShadow: VIDI_SHADOWS.cardElevated,
-                  transform: `scale(${(0.84 + 0.16 * pop).toFixed(4)})`,
-                  opacity: Math.min(1, localF / 5),
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 6,
-                  zIndex: 15 + t.idx,
-                }}
-              >
-                {/* 4 L-Corner HUD Brackets */}
-                {[
-                  { top: -4, left: -4, borderTop: true, borderLeft: true },
-                  { top: -4, right: -4, borderTop: true, borderRight: true },
-                  { bottom: -4, left: -4, borderBottom: true, borderLeft: true },
-                  { bottom: -4, right: -4, borderBottom: true, borderRight: true },
-                ].map((corner, cIdx) => (
-                  <span
-                    key={cIdx}
-                    style={{
-                      position: 'absolute',
-                      top: corner.top,
-                      bottom: corner.bottom,
-                      left: corner.left,
-                      right: corner.right,
-                      width: 12,
-                      height: 12,
-                      borderTop: corner.borderTop ? `2.5px solid ${accentColor}` : undefined,
-                      borderBottom: corner.borderBottom
-                        ? `2.5px solid ${accentColor}`
-                        : undefined,
-                      borderLeft: corner.borderLeft ? `2.5px solid ${accentColor}` : undefined,
-                      borderRight: corner.borderRight
-                        ? `2.5px solid ${accentColor}`
-                        : undefined,
-                      pointerEvents: 'none',
-                    }}
-                  />
-                ))}
-
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 8,
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: VIDI_TYPOGRAPHY.fontMono,
-                      fontSize: 13,
-                      fontWeight: 700,
-                      letterSpacing: '0.08em',
-                      color: accentColor,
-                    }}
-                  >
-                    {t.head.slice(0, tagChars)}
-                  </span>
-                  {isDemo && (
-                    <span
-                      style={{
-                        fontFamily: VIDI_TYPOGRAPHY.fontMono,
-                        fontSize: 11,
-                        fontWeight: 700,
-                        padding: '2px 8px',
-                        borderRadius: VIDI_RADII.pill,
-                        backgroundColor: withAlpha(palette.statusWarning, 0.18),
-                        color: palette.statusWarning,
-                      }}
-                    >
-                      DEMO SAMPLE
-                    </span>
-                  )}
-                </div>
-
-                {t.metricValue && (
-                  <div
-                    style={{
-                      fontSize: 28,
-                      fontWeight: 800,
-                      letterSpacing: '-0.025em',
-                      color: palette.textPrimary,
-                      lineHeight: 1.1,
-                    }}
-                  >
-                    <DigitRoll
-                      value={t.metricValue}
-                      delay={t.triggerFrame + 2}
-                      fontSize={28}
-                      color={palette.textPrimary}
-                      frame={frame}
-                    />
-                  </div>
-                )}
-
-                <div
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 650,
-                    color: palette.textPrimary,
-                    lineHeight: 1.25,
-                  }}
-                >
-                  {t.detail}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -1902,7 +2089,7 @@ export const WhipPanScene: React.FC<WhipPanSceneProps> = ({
   const safeTop = safe.y;
   const safeBottom = canvas.height - (safe.y + safe.height);
 
-  const topInset = safeTop + (hasTopCaption ? (isVertical ? 114 : 92) : 0);
+  const topInset = safeTop + (hasTopCaption ? (isVertical ? 164 : 92) : 0);
   const panels = payload.panels;
   const targetIdx = Math.min(
     panels.length - 1,

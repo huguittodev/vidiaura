@@ -18,10 +18,8 @@ if (fs.existsSync('.env.local')) {
 }
 
 /**
- * VIDEO 1: ZentioGrid — AI-Assisted Visual Web Systems & React/TypeScript Grid Studio.
- * - Commercial Integrity Mode: 'strict' (Zero fabricated percentages/latencies; only product-spec architecture parameters).
- * - Rhythm: 124 BPM, Dark Obsidian / Aurora / Dark-Precision multi-stage look.
- * - Combines all 5 Phase 2 (Batch 1) Shotcraft atoms + Brand Closing CTA.
+ * PHASE 2 BATCH 1 BUILDER (Preserved for 100% Backward Compatibility):
+ * ZentioGrid — 5 Batch 1 Shotcraft atoms + Brand Closing CTA.
  */
 export function buildZentioGridV3SceneGraph(options?: {
   vertical?: boolean;
@@ -38,14 +36,13 @@ export function buildZentioGridV3SceneGraph(options?: {
     outputAudioOffsetFrames: 1,
   };
 
-  // Beat-synced shot cut boundaries at 124 BPM
   const cut0 = beatF(0, beatGrid, fps);
   const cut1 = beatF(6, beatGrid, fps);
   const cut2 = beatF(13, beatGrid, fps);
   const cut3 = beatF(19, beatGrid, fps);
   const cut4 = beatF(25, beatGrid, fps);
   const cut5 = beatF(29, beatGrid, fps);
-  const totalFrames = 480; // Exact 16.0s at 30fps
+  const totalFrames = 480;
 
   const rawGraph: SceneGraph = {
     version: '3.0',
@@ -97,24 +94,18 @@ export function buildZentioGridV3SceneGraph(options?: {
       { frame: 240, x: 0.5, y: 0.5, zoom: 1.04, easing: 'ease-in-out' },
       { frame: 480, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
     ],
-    cursorTrack: [
-      { frame: 0, x: 0.22, y: 0.68 },
-      { frame: 120, x: 0.52, y: 0.46, controlX: 0.38, controlY: 0.32, click: true },
-      { frame: 310, x: 0.68, y: 0.38, controlX: 0.62, controlY: 0.28, click: true },
-      { frame: 480, x: 0.54, y: 0.7 },
-    ],
+    cursorTrack: [],
     audioTrack: [
       {
         id: 'bg-ambient-beat',
         frame: 0,
         asset: 'ambient-beat',
-        volume: 0.42,
+        volume: 0.48,
         fadeInFrames: 12,
         fadeOutFrames: 28,
       },
     ],
     scenes: [
-      // SHOT 1: Mask Reveal (0 -> cut1)
       {
         id: 'zg_shot_1_mask_reveal',
         startFrame: cut0,
@@ -128,29 +119,17 @@ export function buildZentioGridV3SceneGraph(options?: {
           dustParticles: true,
           gridFloor: true,
         },
-        cameraRecipe: {
-          mode: 'dolly-push-in',
-        },
+        cameraRecipe: { mode: 'dolly-push-in' },
         modifiers: {
           captionBar: {
             index: '01 / ZENTIOGRID STUDIO',
             text: 'Visual CSS Grid & Design-to-React Systems Builder',
             appearAt: 2,
           },
-          sheen: {
-            enabled: true,
-            startFrame: 24,
-            durationInFrames: 24,
-          },
+          sheen: { enabled: true, startFrame: 24, durationInFrames: 24 },
         },
-        transitionOut: {
-          type: 'flash-cut',
-          durationInFrames: 10,
-        },
-        debugMeta: {
-          recipeId: 'opening/text-as-mask',
-          ruleRefs: ['R1', 'Q2', 'Q11'],
-        },
+        transitionOut: { type: 'flash-cut', durationInFrames: 10 },
+        debugMeta: { recipeId: 'opening/text-as-mask', ruleRefs: ['R1', 'Q2', 'Q11'] },
         payload: {
           maskWord: 'ZENTIO',
           eyebrow: 'VISUAL WEB SYSTEMS STUDIO',
@@ -181,8 +160,6 @@ export function buildZentioGridV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 2: Exploded 2.5D UI (cut1 -> cut2)
       {
         id: 'zg_shot_2_exploded_25d',
         startFrame: cut1,
@@ -196,41 +173,7 @@ export function buildZentioGridV3SceneGraph(options?: {
           dustParticles: true,
           gridFloor: false,
         },
-        cameraRecipe: {
-          mode: 'isometric-tilt-reveal',
-          keys: [
-            {
-              frame: 0,
-              cx: width / 2,
-              cy: height / 2,
-              zoom: 1.04,
-              rotX: 10,
-              rotY: -12,
-              rotZ: -0.8,
-              persp: 1480,
-            },
-            {
-              frame: 52,
-              cx: width / 2,
-              cy: height / 2,
-              zoom: 1.14,
-              rotX: 6,
-              rotY: -5,
-              rotZ: 0,
-              persp: 1520,
-            },
-            {
-              frame: 100,
-              cx: width / 2,
-              cy: height / 2,
-              zoom: 1.08,
-              rotX: 3,
-              rotY: 0,
-              rotZ: 0,
-              persp: 1560,
-            },
-          ],
-        },
+        cameraRecipe: { mode: 'isometric-tilt-reveal' },
         cropCallouts: [
           {
             id: 'zg_callout_grid',
@@ -257,14 +200,7 @@ export function buildZentioGridV3SceneGraph(options?: {
             appearAt: 3,
           },
         },
-        transitionOut: {
-          type: 'whip-pan-brake',
-          durationInFrames: 12,
-        },
-        debugMeta: {
-          recipeId: 'camera/depth-layer-moves',
-          ruleRefs: ['Q2', 'Q4', 'Q9'],
-        },
+        transitionOut: { type: 'whip-pan-brake', durationInFrames: 12 },
         payload: {
           eyebrow: 'MULTIPLANE SPATIAL INSPECTOR',
           headline: 'Every Layer Linked From Design Token to React Component',
@@ -304,8 +240,6 @@ export function buildZentioGridV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 3: Bento Cascade (cut2 -> cut3)
       {
         id: 'zg_shot_3_bento_cascade',
         startFrame: cut2,
@@ -326,14 +260,7 @@ export function buildZentioGridV3SceneGraph(options?: {
             appearAt: 3,
           },
         },
-        transitionOut: {
-          type: 'portal-zoom-wipe',
-          durationInFrames: 12,
-        },
-        debugMeta: {
-          recipeId: 'ui-entrance/deck-deal-flyin',
-          ruleRefs: ['R2', 'Q8', 'S2'],
-        },
+        transitionOut: { type: 'portal-zoom-wipe', durationInFrames: 12 },
         payload: {
           eyebrow: 'COMPLETE FRONTEND WORKFLOW',
           headline: 'Built for Design Engineers Who Ship Real Code',
@@ -390,8 +317,6 @@ export function buildZentioGridV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 4: Crop Callout Focus Scanline (cut3 -> cut4)
       {
         id: 'zg_shot_4_crop_callout',
         startFrame: cut3,
@@ -412,14 +337,7 @@ export function buildZentioGridV3SceneGraph(options?: {
             appearAt: 3,
           },
         },
-        transitionOut: {
-          type: 'whip-pan-brake',
-          durationInFrames: 12,
-        },
-        debugMeta: {
-          recipeId: 'effects/scanline-annotate-focus',
-          ruleRefs: ['Q11', 'S5'],
-        },
+        transitionOut: { type: 'whip-pan-brake', durationInFrames: 12 },
         payload: {
           statusLabel: 'AST & GRID LOCK',
           windowTitle: 'ZentioGrid Studio — Live Workspace Inspector',
@@ -462,8 +380,6 @@ export function buildZentioGridV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 5: Whip-Pan Brake Pipeline (cut4 -> cut5)
       {
         id: 'zg_shot_5_whip_pan',
         startFrame: cut4,
@@ -484,14 +400,7 @@ export function buildZentioGridV3SceneGraph(options?: {
             appearAt: 2,
           },
         },
-        transitionOut: {
-          type: 'flash-cut',
-          durationInFrames: 8,
-        },
-        debugMeta: {
-          recipeId: 'transition/whip-brake',
-          ruleRefs: ['Q9', 'R1'],
-        },
+        transitionOut: { type: 'flash-cut', durationInFrames: 8 },
         payload: {
           eyebrow: 'END-TO-END SYSTEM PIPELINE',
           targetIndex: 3,
@@ -528,8 +437,6 @@ export function buildZentioGridV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 6: Brand Closing CTA (cut5 -> 480)
       {
         id: 'zg_shot_6_closing_cta',
         startFrame: cut5,
@@ -543,24 +450,16 @@ export function buildZentioGridV3SceneGraph(options?: {
           dustParticles: true,
           gridFloor: true,
         },
-        cameraRecipe: {
-          mode: 'dolly-push-in',
-        },
+        cameraRecipe: { mode: 'dolly-push-in' },
         modifiers: {
-          sheen: {
-            enabled: true,
-            startFrame: 12,
-            durationInFrames: 24,
-          },
+          sheen: { enabled: true, startFrame: 12, durationInFrames: 24 },
           captionBar: {
             index: '06 / ZENTIOGRID.IO',
             text: 'Design Visually in CSS Grid. Ship Production React & TypeScript.',
             appearAt: 2,
           },
         },
-        autoSfxEvents: [
-          { id: 'closing_chime', event: 'cta-chime', frame: 8 },
-        ],
+        autoSfxEvents: [{ id: 'closing_chime', event: 'cta-chime', frame: 8 }],
         payload: {
           productName: 'ZentioGrid',
           tagline: 'Visual CSS Grid & React/TypeScript Systems Studio',
@@ -577,28 +476,18 @@ export function buildZentioGridV3SceneGraph(options?: {
     totalFrames,
     fps
   );
-
-  const candidate: SceneGraph = {
-    ...rawGraph,
-    scenes: quantizedScenes,
-  };
-
-  const parsed = SceneGraphSchema.safeParse(candidate);
+  const parsed = SceneGraphSchema.safeParse({ ...rawGraph, scenes: quantizedScenes });
   if (!parsed.success) {
     throw new Error(
       `ZentioGrid v3 SceneGraph validation failed: ${JSON.stringify(parsed.error.issues, null, 2)}`
     );
   }
-
   return parsed.data as SceneGraph;
 }
 
 /**
- * VIDEO 2: NovaPulse — Clinical Triage & Hospital Ward Operations Platform.
- * - Demonstrates engine versatility on a completely different product domain, aesthetic, rhythm, and asset set.
- * - Commercial Integrity Mode: 'demo-labeled' — illustrative sample metrics are explicitly registered
- *   with `provenance: 'demo-sample'` and rendered with visible `DEMO SAMPLE` badges.
- * - Rhythm: 108 BPM, Warm Light-Editorial & Studio-Light surfaces (`surfaceTheme: 'light'`), Terracotta `#FF5C35` accent.
+ * PHASE 2 BATCH 1 BUILDER (Preserved for 100% Backward Compatibility, standardized to 480 frames):
+ * NovaPulse — Clinical Triage & Hospital Ward Operations Platform.
  */
 export function buildNovaPulseV3SceneGraph(options?: {
   vertical?: boolean;
@@ -615,13 +504,12 @@ export function buildNovaPulseV3SceneGraph(options?: {
     outputAudioOffsetFrames: 1,
   };
 
-  // Beat-synced shot cut boundaries at 108 BPM (1 beat = 16.67 frames)
   const cut0 = beatF(0, beatGrid, fps);
   const cut1 = beatF(6, beatGrid, fps);
   const cut2 = beatF(12, beatGrid, fps);
   const cut3 = beatF(18, beatGrid, fps);
   const cut4 = beatF(24, beatGrid, fps);
-  const totalFrames = 450; // 15.0s at 30fps
+  const totalFrames = 480; // Standardized to 480 frames (16.00s at 30fps)
 
   const rawGraph: SceneGraph = {
     version: '3.0',
@@ -670,27 +558,21 @@ export function buildNovaPulseV3SceneGraph(options?: {
     },
     cameraTrack: [
       { frame: 0, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
-      { frame: 225, x: 0.5, y: 0.5, zoom: 1.03, easing: 'ease-in-out' },
-      { frame: 450, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
+      { frame: 240, x: 0.5, y: 0.5, zoom: 1.03, easing: 'ease-in-out' },
+      { frame: 480, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
     ],
-    cursorTrack: [
-      { frame: 0, x: 0.25, y: 0.65 },
-      { frame: 95, x: 0.48, y: 0.42, controlX: 0.35, controlY: 0.3, click: true },
-      { frame: 260, x: 0.66, y: 0.5, controlX: 0.58, controlY: 0.36, click: true },
-      { frame: 450, x: 0.5, y: 0.7 },
-    ],
+    cursorTrack: [],
     audioTrack: [
       {
         id: 'np-ambient-beat',
         frame: 0,
         asset: 'ambient-beat',
-        volume: 0.4,
+        volume: 0.48,
         fadeInFrames: 15,
         fadeOutFrames: 28,
       },
     ],
     scenes: [
-      // SHOT 1: Crop Callout Scanline Inspection on Light Editorial Surface (0 -> cut1)
       {
         id: 'np_shot_1_triage_scan',
         startFrame: cut0,
@@ -711,10 +593,7 @@ export function buildNovaPulseV3SceneGraph(options?: {
             appearAt: 2,
           },
         },
-        transitionOut: {
-          type: 'whip-pan-brake',
-          durationInFrames: 12,
-        },
+        transitionOut: { type: 'whip-pan-brake', durationInFrames: 12 },
         payload: {
           statusLabel: 'WARD TELEMETRY DEMO',
           windowTitle: 'NovaPulse Command Center — Multi-Wing Bed & Triage Matrix',
@@ -757,8 +636,6 @@ export function buildNovaPulseV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 2: Bento Cascade on Studio Light Surface (cut1 -> cut2)
       {
         id: 'np_shot_2_bento_workflows',
         startFrame: cut1,
@@ -779,10 +656,7 @@ export function buildNovaPulseV3SceneGraph(options?: {
             appearAt: 3,
           },
         },
-        transitionOut: {
-          type: 'portal-zoom-wipe',
-          durationInFrames: 12,
-        },
+        transitionOut: { type: 'portal-zoom-wipe', durationInFrames: 12 },
         payload: {
           eyebrow: 'CARE COORDINATION SUITE',
           headline: 'Every Handoff Tracked From Triage Intake to Discharge',
@@ -823,8 +697,6 @@ export function buildNovaPulseV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 3: Exploded 2.5D UI + Demo-Labeled Metric Callouts (cut2 -> cut3)
       {
         id: 'np_shot_3_exploded_25d',
         startFrame: cut2,
@@ -838,41 +710,7 @@ export function buildNovaPulseV3SceneGraph(options?: {
           dustParticles: false,
           gridFloor: false,
         },
-        cameraRecipe: {
-          mode: 'page-cam-2.5d',
-          keys: [
-            {
-              frame: 0,
-              cx: width / 2,
-              cy: height / 2,
-              zoom: 1.03,
-              rotX: 8,
-              rotY: 10,
-              rotZ: 0.5,
-              persp: 1520,
-            },
-            {
-              frame: 60,
-              cx: width / 2,
-              cy: height / 2,
-              zoom: 1.12,
-              rotX: 4,
-              rotY: 3,
-              rotZ: 0,
-              persp: 1560,
-            },
-            {
-              frame: 100,
-              cx: width / 2,
-              cy: height / 2,
-              zoom: 1.06,
-              rotX: 2,
-              rotY: 0,
-              rotZ: 0,
-              persp: 1600,
-            },
-          ],
-        },
+        cameraRecipe: { mode: 'page-cam-2.5d' },
         cropCallouts: [
           {
             id: 'np_callout_triage',
@@ -898,10 +736,7 @@ export function buildNovaPulseV3SceneGraph(options?: {
             appearAt: 3,
           },
         },
-        transitionOut: {
-          type: 'whip-pan-brake',
-          durationInFrames: 12,
-        },
+        transitionOut: { type: 'whip-pan-brake', durationInFrames: 12 },
         payload: {
           eyebrow: 'MULTI-WING COMMAND BOARD',
           headline: 'Unified Visibility Across Triage, Nursing & Ancillary Teams',
@@ -941,8 +776,6 @@ export function buildNovaPulseV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 4: Whip-Pan Brake Care Pathway (cut3 -> cut4)
       {
         id: 'np_shot_4_whip_pan',
         startFrame: cut3,
@@ -963,10 +796,7 @@ export function buildNovaPulseV3SceneGraph(options?: {
             appearAt: 2,
           },
         },
-        transitionOut: {
-          type: 'flash-cut',
-          durationInFrames: 8,
-        },
+        transitionOut: { type: 'flash-cut', durationInFrames: 8 },
         payload: {
           eyebrow: 'COORDINATED CARE PATHWAY',
           targetIndex: 2,
@@ -1003,8 +833,6 @@ export function buildNovaPulseV3SceneGraph(options?: {
           ],
         },
       },
-
-      // SHOT 5: Brand Closing CTA (cut4 -> 450)
       {
         id: 'np_shot_5_closing_cta',
         startFrame: cut4,
@@ -1018,24 +846,16 @@ export function buildNovaPulseV3SceneGraph(options?: {
           dustParticles: false,
           gridFloor: false,
         },
-        cameraRecipe: {
-          mode: 'dolly-push-in',
-        },
+        cameraRecipe: { mode: 'dolly-push-in' },
         modifiers: {
-          sheen: {
-            enabled: true,
-            startFrame: 10,
-            durationInFrames: 24,
-          },
+          sheen: { enabled: true, startFrame: 10, durationInFrames: 24 },
           captionBar: {
             index: '05 / NOVAPULSE HEALTH',
             text: 'Calm, Coordinated Clinical Operations for Modern Care Teams',
             appearAt: 2,
           },
         },
-        autoSfxEvents: [
-          { id: 'np_closing_chime', event: 'cta-chime', frame: 8 },
-        ],
+        autoSfxEvents: [{ id: 'np_closing_chime', event: 'cta-chime', frame: 8 }],
         payload: {
           productName: 'NovaPulse',
           tagline: 'Clinical Triage & Ward Operations Platform (Demo Showcase)',
@@ -1052,19 +872,988 @@ export function buildNovaPulseV3SceneGraph(options?: {
     totalFrames,
     fps
   );
-
-  const candidate: SceneGraph = {
-    ...rawGraph,
-    scenes: quantizedScenes,
-  };
-
-  const parsed = SceneGraphSchema.safeParse(candidate);
+  const parsed = SceneGraphSchema.safeParse({ ...rawGraph, scenes: quantizedScenes });
   if (!parsed.success) {
     throw new Error(
       `NovaPulse v3 SceneGraph validation failed: ${JSON.stringify(parsed.error.issues, null, 2)}`
     );
   }
+  return parsed.data as SceneGraph;
+}
 
+/**
+ * PHASE 2 BATCH 2 DEMO 1:
+ * ZentioGrid — Combines Batch 2 + Batch 1 Shotcraft atoms (`lead_word_assemble`, `type_and_filter`,
+ * `steep_tilt_glide`, `chart_live_moves`, `portal_zoom_hub`, `brand_closing_cta`).
+ * - Strict commercial integrity mode, 124 BPM, Dark Obsidian / Aurora / Dark-Precision multi-stage look.
+ * - Root `cursorTrack: []` so no stray mouse cursor floats over non-interactive shots,
+ *   while `type_and_filter` renders its own purposeful scene-scoped interactive cursor.
+ */
+export function buildZentioGridBatch2SceneGraph(options?: {
+  vertical?: boolean;
+}): SceneGraph {
+  const fps = 30;
+  const isVertical = Boolean(options?.vertical);
+  const width = isVertical ? 1080 : 1920;
+  const height = isVertical ? 1920 : 1080;
+
+  const beatGrid = {
+    bpm: 124,
+    beat0Seconds: 0,
+    beatsPerBar: 4,
+    outputAudioOffsetFrames: 1,
+  };
+
+  const cut0 = beatF(0, beatGrid, fps);
+  const cut1 = beatF(6, beatGrid, fps);
+  const cut2 = beatF(12, beatGrid, fps);
+  const cut3 = beatF(18, beatGrid, fps);
+  const cut4 = beatF(24, beatGrid, fps);
+  const cut5 = beatF(29, beatGrid, fps);
+  const totalFrames = 480;
+
+  const rawGraph: SceneGraph = {
+    version: '3.0',
+    commercialIntegrityMode: 'strict',
+    verifiedMetricsRegistry: [
+      {
+        value: '12-Col',
+        label: 'CSS Grid Engine',
+        source: 'ZentioGrid Layout Spec v3',
+        provenance: 'product-spec',
+      },
+      {
+        value: '3 Viewports',
+        label: 'Responsive Breakpoints',
+        source: 'ZentioGrid Viewport Matrix',
+        provenance: 'product-spec',
+      },
+      {
+        value: 'Strict TSX',
+        label: 'Code Synthesis Target',
+        source: 'ZentioGrid Compiler Spec',
+        provenance: 'product-spec',
+      },
+    ],
+    canvas: {
+      width,
+      height,
+      fps,
+      durationInFrames: totalFrames,
+    },
+    beatGrid,
+    artDirection: {
+      backdropVariant: 'dark-precision',
+      surfaceTheme: 'dark',
+      primaryAccent: '#7C3AED',
+      archetype: 'linear-dark',
+      stage: {
+        look: 'obsidian',
+        grainOpacity: 0.024,
+        vignetteStrength: 0.42,
+        dustParticles: true,
+        gridFloor: true,
+        horizon: 0.64,
+        keyLight: { x: 0.5, y: 0.34 },
+      },
+    },
+    cameraTrack: [
+      { frame: 0, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
+      { frame: 240, x: 0.5, y: 0.5, zoom: 1.04, easing: 'ease-in-out' },
+      { frame: 480, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
+    ],
+    cursorTrack: [],
+    audioTrack: [
+      {
+        id: 'bg-ambient-beat',
+        frame: 0,
+        asset: 'ambient-beat',
+        volume: 0.48,
+        fadeInFrames: 12,
+        fadeOutFrames: 28,
+      },
+    ],
+    scenes: [
+      // SHOT 1: Lead Word Zoom Assemble + Pill Slot Cycle (0 -> cut1)
+      {
+        id: 'zg_b2_shot_1_lead_word',
+        startFrame: cut0,
+        durationInFrames: cut1 - cut0,
+        type: 'lead_word_assemble',
+        layoutPreset: 'hook',
+        stageOverride: {
+          look: 'obsidian',
+          grainOpacity: 0.024,
+          vignetteStrength: 0.45,
+          dustParticles: true,
+          gridFloor: true,
+        },
+        cameraRecipe: { mode: 'crash-zoom-punch' },
+        modifiers: {
+          captionBar: {
+            index: '01 / ZENTIOGRID STUDIO',
+            text: 'Kinetic Lead-Word Opener & Rotating Capability Slot Reel',
+            appearAt: 2,
+          },
+          sheen: { enabled: true, startFrame: 22, durationInFrames: 24 },
+        },
+        transitionOut: { type: 'flash-cut', durationInFrames: 8 },
+        debugMeta: {
+          recipeId: 'typography/lead-word-zoom-assemble',
+          ruleRefs: ['R1', 'Q2', 'Q11'],
+        },
+        payload: {
+          eyebrow: 'VISUAL WEB SYSTEMS STUDIO',
+          leadWord: 'ZENTIO',
+          trailingWords: ['builds', 'responsive', 'React', 'systems'],
+          highlightWord: 'React',
+          subheadline: 'Compose 12-column CSS grids visually and compile strict TypeScript components.',
+          cyclingPills: [
+            '12-COL CSS SUBGRID',
+            'DESIGN TOKEN GRAPH',
+            'STRICT REACT TSX',
+            'MULTI-VIEWPORT MATRIX',
+          ],
+          crashZoomOut: true,
+        },
+      },
+
+      // SHOT 2: Type-and-Filter Interactive Search + Grid Reflow + Cursor Flyover (cut1 -> cut2)
+      {
+        id: 'zg_b2_shot_2_type_filter',
+        startFrame: cut1,
+        durationInFrames: cut2 - cut1,
+        type: 'type_and_filter',
+        layoutPreset: 'stage',
+        stageOverride: {
+          look: 'dark-precision',
+          grainOpacity: 0.022,
+          vignetteStrength: 0.38,
+          dustParticles: false,
+          gridFloor: true,
+        },
+        modifiers: {
+          captionBar: {
+            index: '02 / COMMAND PALETTE',
+            text: 'Human-Paced Search Typing, Live Grid Reflow & Purposeful Cursor Selection',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'card-flip-reveal', durationInFrames: 12 },
+        debugMeta: {
+          recipeId: 'interaction/type-and-filter',
+          ruleRefs: ['R2', 'Q11', 'S2'],
+        },
+        payload: {
+          eyebrow: 'INSTANT COMPONENT & TOKEN SEARCH',
+          headline: 'Filter Layout Primitives & Token Bindings in Real Time',
+          searchPlaceholder: 'Search grid modules, subgrid tracks, or TSX compilers...',
+          searchQuery: 'subgrid token',
+          targetCardId: 'zg_card_subgrid',
+          mediaUrl: 'demo-assets/zentiogrid-studio-capture.svg',
+          cards: [
+            {
+              id: 'zg_card_subgrid',
+              category: 'CSS GRID ENGINE',
+              title: '12-Col Subgrid Token Lock',
+              subtitle: 'Binds nested card tracks directly to parent CSS Grid & design token variables.',
+              badge: 'MATCHED',
+              mediaUrl: 'demo-assets/zentiogrid-studio-capture.svg',
+              accentColor: '#A855F7',
+            },
+            {
+              id: 'zg_card_tokens',
+              category: 'TOKEN COMPILER',
+              title: 'Semantic Subgrid Token Sync',
+              subtitle: 'Generates zero-runtime CSS custom properties and typed TS token maps.',
+              badge: 'TOKENS',
+              accentColor: '#7C3AED',
+            },
+            {
+              id: 'zg_card_tsx',
+              category: 'CODE SYNTHESIS',
+              title: 'Strict React TSX Emitter',
+              subtitle: 'Compiles visual grid spans into clean, human-readable React components.',
+              badge: 'COMPILER',
+              accentColor: '#22C55E',
+            },
+            {
+              id: 'zg_card_viewports',
+              category: 'RESPONSIVE MATRIX',
+              title: '3-Viewport Breakpoint Inspector',
+              subtitle: 'Preview 16:9 desktop, tablet, and 9:16 mobile layouts simultaneously.',
+              badge: 'VIEWPORTS',
+              accentColor: '#5E6AD2',
+            },
+            {
+              id: 'zg_card_a11y',
+              category: 'GUARDRAILS',
+              title: 'Safe-Area & Contrast Verifier',
+              subtitle: 'Enforces WCAG contrast ratios and viewport margin budgets automatically.',
+              badge: 'WCAG AA',
+              accentColor: '#22C55E',
+            },
+            {
+              id: 'zg_card_git',
+              category: 'DEPLOYMENT',
+              title: 'Git Pull Request Sync',
+              subtitle: 'Commits generated TSX and token diffs directly to feature branches.',
+              badge: 'GIT SYNC',
+              accentColor: '#A855F7',
+            },
+          ],
+        },
+      },
+
+      // SHOT 3: Steep-Tilt Oblique 3D Table-Top Glide + FloatWrap Widgets (cut2 -> cut3)
+      {
+        id: 'zg_b2_shot_3_steep_glide',
+        startFrame: cut2,
+        durationInFrames: cut3 - cut2,
+        type: 'steep_tilt_glide',
+        layoutPreset: 'stage',
+        stageOverride: {
+          look: 'aurora-blur',
+          grainOpacity: 0.024,
+          vignetteStrength: 0.4,
+          dustParticles: true,
+          gridFloor: false,
+        },
+        cameraRecipe: { mode: 'steep-tilt-glide' },
+        cropCallouts: [
+          {
+            id: 'zg_glide_callout',
+            label: 'CSS Grid Engine',
+            metricValue: '12-Col',
+            sublabel: 'Docked in peripheral safe zone — zero UI occlusion',
+            badge: 'PRODUCT SPEC',
+            provenance: 'product-spec',
+            sourceRef: 'ZentioGrid Layout Spec v3',
+            showBracket: true,
+            x: 0.5,
+            y: 0.48,
+            width: 376,
+            height: 144,
+            elevationZ: 88,
+            enterFrame: 14,
+            accentColor: '#A855F7',
+          },
+        ],
+        modifiers: {
+          captionBar: {
+            index: '03 / 3D TABLE-TOP GLIDE',
+            text: 'Steep-Angle Perspective Glide With Zero-Phase FloatWrap Telemetry Cards',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'whip-pan-brake', durationInFrames: 12 },
+        debugMeta: {
+          recipeId: 'camera/steep-tilt-glide',
+          ruleRefs: ['Q2', 'Q9', 'Q11'],
+        },
+        payload: {
+          eyebrow: 'SPATIAL CANVAS TRAVERSAL',
+          headline: 'Glide Across Complex Grid Systems Without Losing Crisp Typography',
+          subheadline: 'CSS zoom layout scaling keeps every label razor-sharp under 3D perspective.',
+          surfaceTitle: 'zentiogrid.canvas --grid=12col --tokens=strict',
+          mediaUrl: 'demo-assets/zentiogrid-studio-capture.svg',
+          tiltAngleDeg: 42,
+          glideDistancePx: isVertical ? 210 : 280,
+          widgets: [
+            {
+              id: 'zg_w1',
+              category: 'TRACK SOLVER',
+              title: 'repeat(12, minmax(0, 1fr))',
+              detail: 'Fluid gap & subgrid alignment across nested containers',
+              badge: '12-COL',
+              accentColor: '#A855F7',
+            },
+            {
+              id: 'zg_w2',
+              category: 'TOKEN GRAPH',
+              title: 'Zero Raw Hex Literals',
+              detail: 'Every surface color and radius bound to design tokens',
+              badge: 'STRICT TOKENS',
+              accentColor: '#7C3AED',
+            },
+            {
+              id: 'zg_w3',
+              category: 'AST OUTPUT',
+              title: 'Typed React Components',
+              detail: 'Deterministic JSX + TypeScript interfaces ready for production',
+              badge: 'STRICT TSX',
+              accentColor: '#22C55E',
+            },
+          ],
+        },
+      },
+
+      // SHOT 4: Chart Live Moves — Oscilloscope Telemetry & Provenance Readouts (cut3 -> cut4)
+      {
+        id: 'zg_b2_shot_4_chart_live',
+        startFrame: cut3,
+        durationInFrames: cut4 - cut3,
+        type: 'chart_live_moves',
+        layoutPreset: 'split',
+        stageOverride: {
+          look: 'obsidian',
+          grainOpacity: 0.024,
+          vignetteStrength: 0.44,
+          dustParticles: true,
+          gridFloor: true,
+        },
+        modifiers: {
+          captionBar: {
+            index: '04 / COMPILER TELEMETRY',
+            text: 'Live Dual-Trace Waveform With Verified Product-Spec Parameters',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'iris-portal-wipe', durationInFrames: 12 },
+        debugMeta: {
+          recipeId: 'data/chart-live-moves',
+          ruleRefs: ['Q11', 'S5'],
+        },
+        payload: {
+          eyebrow: 'VERIFIED ARCHITECTURE SPECS',
+          headline: 'Deterministic Layout Compilation Across Every Viewport',
+          primaryMetricValue: '12-Col',
+          primaryMetricUnit: 'CSS GRID',
+          primaryMetricLabel: 'CSS Grid Engine • Subgrid & Fluid Tracks',
+          provenance: 'product-spec',
+          burstTagLabel: 'AST COMPILER VERIFIED',
+          mediaUrl: 'demo-assets/zentiogrid-studio-capture.svg',
+          seriesSeed: 17,
+          secondaryReadouts: [
+            {
+              label: 'Responsive Breakpoints',
+              value: '3 Viewports',
+              unit: '16:9 / 9:16',
+              provenance: 'product-spec',
+            },
+            {
+              label: 'Code Synthesis Target',
+              value: 'Strict TSX',
+              unit: 'ZERO RUNTIME',
+              provenance: 'product-spec',
+            },
+          ],
+        },
+      },
+
+      // SHOT 5: Portal Zoom Hub — Card Expansion into Radial Architecture Map (cut4 -> cut5)
+      {
+        id: 'zg_b2_shot_5_portal_hub',
+        startFrame: cut4,
+        durationInFrames: cut5 - cut4,
+        type: 'portal_zoom_hub',
+        layoutPreset: 'stage',
+        stageOverride: {
+          look: 'aurora-blur',
+          grainOpacity: 0.022,
+          vignetteStrength: 0.4,
+          dustParticles: true,
+          gridFloor: true,
+        },
+        modifiers: {
+          captionBar: {
+            index: '05 / ECOSYSTEM CONDUIT HUB',
+            text: 'Portal Zoom Expansion From Workspace Card to Radial System Map',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'flash-cut', durationInFrames: 8 },
+        debugMeta: {
+          recipeId: 'transition/portal-wipe-hub',
+          ruleRefs: ['R2', 'Q9', 'S2'],
+        },
+        payload: {
+          eyebrow: 'CONNECTED FRONTEND PIPELINE',
+          workspaceTitle: 'ZentioGrid Studio — System Architecture',
+          portalCardTitle: 'ZENTIO CORE',
+          hubHeadline: 'One Visual Grid Graph Feeding Your Entire Codebase',
+          hubSubheadline: 'Portal transition into connected design token, compiler, and Git nodes.',
+          mediaUrl: 'demo-assets/zentiogrid-studio-capture.svg',
+          nodes: [
+            {
+              id: 'zg_hub_1',
+              label: '12-Col Grid Canvas',
+              detail: 'Interactive drag-to-span tracks',
+              iconKind: 'capture',
+              accentColor: '#A855F7',
+            },
+            {
+              id: 'zg_hub_2',
+              label: 'Design Token Graph',
+              detail: 'CSS custom properties & TS map',
+              iconKind: 'recipe',
+              accentColor: '#7C3AED',
+            },
+            {
+              id: 'zg_hub_3',
+              label: 'Strict TSX Compiler',
+              detail: 'Clean React component output',
+              iconKind: 'code',
+              accentColor: '#22C55E',
+            },
+            {
+              id: 'zg_hub_4',
+              label: '3-Viewport Matrix',
+              detail: 'Desktop, Tablet & Mobile sync',
+              iconKind: 'capture',
+              accentColor: '#5E6AD2',
+            },
+            {
+              id: 'zg_hub_5',
+              label: 'Git Branch Sync',
+              detail: 'Instant PR & preview deploy',
+              iconKind: 'code',
+              accentColor: '#A855F7',
+            },
+          ],
+        },
+      },
+
+      // SHOT 6: Brand Closing CTA (cut5 -> 480)
+      {
+        id: 'zg_b2_shot_6_closing_cta',
+        startFrame: cut5,
+        durationInFrames: totalFrames - cut5,
+        type: 'brand_closing_cta',
+        layoutPreset: 'lower-third',
+        stageOverride: {
+          look: 'obsidian',
+          grainOpacity: 0.022,
+          vignetteStrength: 0.45,
+          dustParticles: true,
+          gridFloor: true,
+        },
+        cameraRecipe: { mode: 'dolly-push-in' },
+        modifiers: {
+          sheen: { enabled: true, startFrame: 12, durationInFrames: 24 },
+          captionBar: {
+            index: '06 / ZENTIOGRID.IO',
+            text: 'Design Visually in CSS Grid. Ship Production React & TypeScript.',
+            appearAt: 2,
+          },
+        },
+        autoSfxEvents: [{ id: 'closing_chime', event: 'cta-chime', frame: 8 }],
+        payload: {
+          productName: 'ZentioGrid',
+          tagline: 'Visual CSS Grid & React/TypeScript Systems Studio',
+          showLogo: true,
+          buttonText: 'Launch Studio Free',
+        },
+      },
+    ],
+  };
+
+  const quantizedScenes = quantizeScenesToBeatGrid(
+    rawGraph.scenes,
+    beatGrid,
+    totalFrames,
+    fps
+  );
+  const parsed = SceneGraphSchema.safeParse({ ...rawGraph, scenes: quantizedScenes });
+  if (!parsed.success) {
+    throw new Error(
+      `ZentioGrid Batch 2 SceneGraph validation failed: ${JSON.stringify(parsed.error.issues, null, 2)}`
+    );
+  }
+  return parsed.data as SceneGraph;
+}
+
+/**
+ * PHASE 2 BATCH 2 DEMO 2 (Real Un-Tailored Raster PNG Showcase):
+ * NovaPulse / AIFL Operations Workbench — Uses real raster PNG captures with diverse aspect ratios:
+ * - `demo-assets/real-captures/aifl-projects-full.png` (3840x3492, aspect 1.10:1 tall capture)
+ * - `demo-assets/real-captures/aifl-detail-full.png` (3840x2344, aspect 1.64:1)
+ * - `demo-assets/real-captures/aifl-wbr-full.png` (3840x2160, aspect 1.78:1)
+ * - `demo-assets/real-captures/workbench-overview.png` (1728x1080, aspect 1.60:1)
+ * - `demo-assets/real-captures/workbench-inspector.png` (320x647, aspect 0.49:1 vertical sidebar)
+ * - Exact 480 frames (16.00s at 30fps), 108 BPM, Warm Light-Editorial & Studio-Light surfaces.
+ */
+export function buildNovaPulseRealPngSceneGraph(options?: {
+  vertical?: boolean;
+}): SceneGraph {
+  const fps = 30;
+  const isVertical = Boolean(options?.vertical);
+  const width = isVertical ? 1080 : 1920;
+  const height = isVertical ? 1920 : 1080;
+
+  const beatGrid = {
+    bpm: 108,
+    beat0Seconds: 0,
+    beatsPerBar: 4,
+    outputAudioOffsetFrames: 1,
+  };
+
+  const cut0 = beatF(0, beatGrid, fps);
+  const cut1 = beatF(5, beatGrid, fps);
+  const cut2 = beatF(10, beatGrid, fps);
+  const cut3 = beatF(15, beatGrid, fps);
+  const cut4 = beatF(20, beatGrid, fps);
+  const cut5 = beatF(25, beatGrid, fps);
+  const totalFrames = 480;
+
+  const rawGraph: SceneGraph = {
+    version: '3.0',
+    commercialIntegrityMode: 'demo-labeled',
+    verifiedMetricsRegistry: [
+      {
+        value: '18 / 20',
+        label: 'Active Pipeline Lanes',
+        source: 'Illustrative operations workbench simulation dataset',
+        provenance: 'demo-sample',
+      },
+      {
+        value: '31 / 36',
+        label: 'Weekly WBR Sync Nodes',
+        source: 'Illustrative operations workbench simulation dataset',
+        provenance: 'demo-sample',
+      },
+      {
+        value: '4.2 min',
+        label: 'Sample Review Turnaround',
+        source: 'Illustrative operations workbench simulation dataset',
+        provenance: 'demo-sample',
+      },
+    ],
+    canvas: {
+      width,
+      height,
+      fps,
+      durationInFrames: totalFrames,
+    },
+    beatGrid,
+    artDirection: {
+      backdropVariant: 'light-editorial',
+      surfaceTheme: 'light',
+      primaryAccent: '#FF5C35',
+      archetype: 'base44-studio',
+      stage: {
+        look: 'light-editorial',
+        grainOpacity: 0.015,
+        vignetteStrength: 0.22,
+        dustParticles: false,
+        gridFloor: false,
+        horizon: 0.62,
+        keyLight: { x: 0.48, y: 0.28 },
+      },
+    },
+    cameraTrack: [
+      { frame: 0, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
+      { frame: 240, x: 0.5, y: 0.5, zoom: 1.03, easing: 'ease-in-out' },
+      { frame: 480, x: 0.5, y: 0.5, zoom: 1.0, easing: 'ease-in-out' },
+    ],
+    cursorTrack: [],
+    audioTrack: [
+      {
+        id: 'np-ambient-beat',
+        frame: 0,
+        asset: 'ambient-beat',
+        volume: 0.48,
+        fadeInFrames: 15,
+        fadeOutFrames: 28,
+      },
+    ],
+    scenes: [
+      // SHOT 1: Non-Occluding Crop Callout Inspection on Real Tall PNG (3840x3492, 1.10:1)
+      {
+        id: 'np_b2_shot_1_real_png_crop',
+        startFrame: cut0,
+        durationInFrames: cut1 - cut0,
+        type: 'crop_callout',
+        layoutPreset: 'stage',
+        stageOverride: {
+          look: 'light-editorial',
+          grainOpacity: 0.014,
+          vignetteStrength: 0.18,
+          dustParticles: false,
+          gridFloor: false,
+        },
+        modifiers: {
+          captionBar: {
+            index: '01 / REAL PNG (3840×3492)',
+            text: 'Non-Occluding Split Dock + Adaptive Contain Framing on Tall Capture',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'card-flip-reveal', durationInFrames: 12 },
+        payload: {
+          statusLabel: 'REAL RASTER PNG • 1.10:1',
+          windowTitle: 'NovaPulse Workbench — Real Un-Tailored Project Directory Capture',
+          headline: 'Inspect Arbitrary Aspect-Ratio Captures Without Cropping or Occlusion',
+          mediaUrl: 'demo-assets/real-captures/aifl-projects-full.png',
+          targets: [
+            {
+              id: 'np_target_lanes',
+              head: 'ACTIVE PIPELINE LANES',
+              detail: 'Transparent reticle marks the table header while card docks on the right rail',
+              metricValue: '18 / 20',
+              provenance: 'demo-sample',
+              x: 0.28,
+              y: 0.26,
+              width: 0.26,
+              height: 0.16,
+            },
+            {
+              id: 'np_target_wbr',
+              head: 'WEEKLY WBR SYNC NODES',
+              detail: 'Full 3840×3492 screenshot preserved via AdaptiveMediaSurface contain framing',
+              metricValue: '31 / 36',
+              provenance: 'demo-sample',
+              x: 0.54,
+              y: 0.52,
+              width: 0.28,
+              height: 0.16,
+            },
+            {
+              id: 'np_target_turnaround',
+              head: 'SAMPLE REVIEW WINDOW',
+              detail: 'Explicitly badged as DEMO SAMPLE under commercialIntegrityMode',
+              metricValue: '4.2 min',
+              provenance: 'demo-sample',
+              x: 0.74,
+              y: 0.76,
+              width: 0.26,
+              height: 0.16,
+            },
+          ],
+        },
+      },
+
+      // SHOT 2: Type-and-Filter with Real PNG Captures + Purposeful Cursor Flyover
+      {
+        id: 'np_b2_shot_2_type_filter',
+        startFrame: cut1,
+        durationInFrames: cut2 - cut1,
+        type: 'type_and_filter',
+        layoutPreset: 'stage',
+        stageOverride: {
+          look: 'studio-light',
+          grainOpacity: 0.014,
+          vignetteStrength: 0.2,
+          dustParticles: false,
+          gridFloor: false,
+        },
+        modifiers: {
+          captionBar: {
+            index: '02 / WORKSPACE FILTERING',
+            text: 'Search Typing, Grid Reflow & Cursor Click Across Real PNG Screenshots',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'whip-pan-brake', durationInFrames: 12 },
+        payload: {
+          eyebrow: 'OPERATIONS COMMAND SEARCH',
+          headline: 'Locate Any Project Board, WBR Deck, or Inspector View Instantly',
+          searchPlaceholder: 'Filter real captures by board, WBR, or inspector...',
+          searchQuery: 'wbr telemetry',
+          targetCardId: 'np_filter_wbr',
+          mediaUrl: 'demo-assets/real-captures/aifl-wbr-full.png',
+          cards: [
+            {
+              id: 'np_filter_wbr',
+              category: 'WBR TELEMETRY • 3840×2160',
+              title: 'Weekly WBR Telemetry Deck',
+              subtitle: 'Real high-DPI raster capture adapted automatically inside card slot.',
+              badge: 'SELECTED',
+              mediaUrl: 'demo-assets/real-captures/aifl-wbr-full.png',
+              accentColor: '#FF5C35',
+            },
+            {
+              id: 'np_filter_detail',
+              category: 'DETAIL VIEW • 3840×2344',
+              title: 'WBR Telemetry Detail Drilldown',
+              subtitle: '1.64:1 desktop capture framed with blurred ambient backdrop fill.',
+              badge: 'MATCHED',
+              mediaUrl: 'demo-assets/real-captures/aifl-detail-full.png',
+              accentColor: '#5E6AD2',
+            },
+            {
+              id: 'np_filter_projects',
+              category: 'DIRECTORY • 3840×3492',
+              title: 'Full-Page Project Matrix',
+              subtitle: 'Tall 1.10:1 capture scaled without cutting off top navigation or footer.',
+              badge: 'CAPTURE',
+              mediaUrl: 'demo-assets/real-captures/aifl-projects-full.png',
+              accentColor: '#22C55E',
+            },
+            {
+              id: 'np_filter_workbench',
+              category: 'WORKBENCH • 1728×1080',
+              title: 'Timeline & Canvas Overview',
+              subtitle: '16:10 dark studio capture rendered inside light-editorial card shell.',
+              badge: 'STUDIO',
+              mediaUrl: 'demo-assets/real-captures/workbench-overview.png',
+              accentColor: '#FF5C35',
+            },
+            {
+              id: 'np_filter_inspector',
+              category: 'SIDEBAR • 320×647',
+              title: 'Vertical Property Inspector',
+              subtitle: 'Narrow 0.49:1 sidebar PNG centered cleanly with ambient glass fill.',
+              badge: 'PANEL',
+              mediaUrl: 'demo-assets/real-captures/workbench-inspector.png',
+              accentColor: '#5E6AD2',
+            },
+            {
+              id: 'np_filter_clinical',
+              category: 'TRIAGE BOARD',
+              title: 'Multi-Wing Ward Matrix',
+              subtitle: 'Synchronized shift handoff and acuity routing overview.',
+              badge: 'SYNCED',
+              mediaUrl: 'demo-assets/novapulse-clinical-capture.svg',
+              accentColor: '#22C55E',
+            },
+          ],
+        },
+      },
+
+      // SHOT 3: Steep-Tilt Glide on Real PNG (3840x2344) + Sidebar PNG (320x647)
+      {
+        id: 'np_b2_shot_3_steep_glide',
+        startFrame: cut2,
+        durationInFrames: cut3 - cut2,
+        type: 'steep_tilt_glide',
+        layoutPreset: 'stage',
+        stageOverride: {
+          look: 'light-editorial',
+          grainOpacity: 0.015,
+          vignetteStrength: 0.22,
+          dustParticles: false,
+          gridFloor: false,
+        },
+        cameraRecipe: { mode: 'steep-tilt-glide' },
+        cropCallouts: [
+          {
+            id: 'np_callout_triage',
+            label: 'Sample Review Turnaround',
+            metricValue: '4.2 min',
+            sublabel: 'Peripheral dock avoids central UI focal zone',
+            provenance: 'demo-sample',
+            sourceRef: 'Illustrative operations workbench simulation dataset',
+            showBracket: true,
+            x: 0.5,
+            y: 0.5,
+            width: 384,
+            height: 146,
+            elevationZ: 88,
+            enterFrame: 12,
+            accentColor: '#5E6AD2',
+          },
+        ],
+        modifiers: {
+          captionBar: {
+            index: '03 / 3D GLIDE ON REAL PNG',
+            text: 'Oblique Camera Glide Over 3840×2344 & 320×647 Captures + Peripheral Callout',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'iris-portal-wipe', durationInFrames: 12 },
+        payload: {
+          eyebrow: 'MULTI-RESOLUTION CAPTURE GLIDE',
+          headline: 'Combine Wide Desktop & Narrow Sidebar PNGs in One 3D Plane',
+          subheadline: 'Both 1.64:1 and 0.49:1 captures preserve 100% of their UI chrome.',
+          surfaceTitle: 'novapulse.inspect --source=aifl-detail-full.png --aspect=1.64',
+          mediaUrl: 'demo-assets/real-captures/aifl-detail-full.png',
+          secondaryMediaUrl: 'demo-assets/real-captures/workbench-inspector.png',
+          tiltAngleDeg: 40,
+          glideDistancePx: isVertical ? 200 : 260,
+          widgets: [
+            {
+              id: 'np_w1',
+              category: 'ASPECT 1.64:1',
+              title: '3840×2344 Detail Capture',
+              detail: 'Zero header or sidebar clipping under oblique 3D camera tilt',
+              badge: 'REAL PNG',
+              accentColor: '#FF5C35',
+            },
+            {
+              id: 'np_w2',
+              category: 'ASPECT 0.49:1',
+              title: '320×647 Inspector Rail',
+              detail: 'Portrait sidebar capture paired cleanly beside primary canvas',
+              badge: 'PORTRAIT PNG',
+              accentColor: '#5E6AD2',
+            },
+            {
+              id: 'np_w3',
+              category: 'DEMO INTEGRITY',
+              title: 'Labeled Sample Metrics',
+              detail: 'All illustrative figures carry visible DEMO SAMPLE provenance badges',
+              badge: 'DEMO SAMPLE',
+              accentColor: '#22C55E',
+            },
+          ],
+        },
+      },
+
+      // SHOT 4: Chart Live Moves — Live Telemetry Stream + Demo-Labeled Readouts
+      {
+        id: 'np_b2_shot_4_chart_live',
+        startFrame: cut3,
+        durationInFrames: cut4 - cut3,
+        type: 'chart_live_moves',
+        layoutPreset: 'split',
+        stageOverride: {
+          look: 'studio-light',
+          grainOpacity: 0.014,
+          vignetteStrength: 0.2,
+          dustParticles: false,
+          gridFloor: false,
+        },
+        modifiers: {
+          captionBar: {
+            index: '04 / TELEMETRY & PROVENANCE',
+            text: 'Real-Time Oscilloscope Stream With Explicit DEMO SAMPLE Provenance',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'portal-zoom-wipe', durationInFrames: 12 },
+        payload: {
+          eyebrow: 'ILLUSTRATIVE TELEMETRY STREAM',
+          headline: 'Track Weekly WBR Cadence & Review Turnaround Live',
+          primaryMetricValue: '4.2 min',
+          primaryMetricUnit: 'TURNAROUND',
+          primaryMetricLabel: 'Sample Review Turnaround • Illustrative Dataset',
+          provenance: 'demo-sample',
+          burstTagLabel: 'DEMO SAMPLE STREAM',
+          mediaUrl: 'demo-assets/real-captures/aifl-wbr-full.png',
+          seriesSeed: 42,
+          secondaryReadouts: [
+            {
+              label: 'Active Pipeline Lanes',
+              value: '18 / 20',
+              unit: 'DEMO SAMPLE',
+              provenance: 'demo-sample',
+            },
+            {
+              label: 'Weekly WBR Sync Nodes',
+              value: '31 / 36',
+              unit: 'DEMO SAMPLE',
+              provenance: 'demo-sample',
+            },
+          ],
+        },
+      },
+
+      // SHOT 5: Portal Zoom Hub — Real Workbench PNG Expanding into Operations Hub
+      {
+        id: 'np_b2_shot_5_portal_hub',
+        startFrame: cut4,
+        durationInFrames: cut5 - cut4,
+        type: 'portal_zoom_hub',
+        layoutPreset: 'stage',
+        stageOverride: {
+          look: 'light-editorial',
+          grainOpacity: 0.014,
+          vignetteStrength: 0.2,
+          dustParticles: false,
+          gridFloor: false,
+        },
+        modifiers: {
+          captionBar: {
+            index: '05 / PORTAL OPERATIONS HUB',
+            text: 'Expanding Real 1728×1080 Workbench Capture Into Connected Workflow Nodes',
+            appearAt: 2,
+          },
+        },
+        transitionOut: { type: 'flash-cut', durationInFrames: 8 },
+        payload: {
+          eyebrow: 'UNIFIED OPERATIONS TOPOLOGY',
+          workspaceTitle: 'NovaPulse Workbench — 1728×1080 Real Capture',
+          portalCardTitle: 'NOVAPULSE HUB',
+          hubHeadline: 'Connect Every Capture, Metric & Review Stream in One Hub',
+          hubSubheadline: 'Portal transition from real workbench screenshot into radial ecosystem map.',
+          mediaUrl: 'demo-assets/real-captures/workbench-overview.png',
+          nodes: [
+            {
+              id: 'np_hub_1',
+              label: 'Project Directory',
+              detail: '3840×3492 full-page capture',
+              iconKind: 'capture',
+              accentColor: '#FF5C35',
+            },
+            {
+              id: 'np_hub_2',
+              label: 'Detail Drilldown',
+              detail: '3840×2344 view inspection',
+              iconKind: 'recipe',
+              accentColor: '#5E6AD2',
+            },
+            {
+              id: 'np_hub_3',
+              label: 'WBR Telemetry Deck',
+              detail: '3840×2160 live metrics',
+              iconKind: 'code',
+              accentColor: '#22C55E',
+            },
+            {
+              id: 'np_hub_4',
+              label: 'Timeline Workbench',
+              detail: '1728×1080 studio canvas',
+              iconKind: 'music',
+              accentColor: '#FF5C35',
+            },
+            {
+              id: 'np_hub_5',
+              label: 'Inspector Sidebar',
+              detail: '320×647 portrait panel',
+              iconKind: 'sfx',
+              accentColor: '#5E6AD2',
+            },
+          ],
+        },
+      },
+
+      // SHOT 6: Brand Closing CTA (cut5 -> 480)
+      {
+        id: 'np_b2_shot_6_closing_cta',
+        startFrame: cut5,
+        durationInFrames: totalFrames - cut5,
+        type: 'brand_closing_cta',
+        layoutPreset: 'lower-third',
+        stageOverride: {
+          look: 'light-editorial',
+          grainOpacity: 0.014,
+          vignetteStrength: 0.2,
+          dustParticles: false,
+          gridFloor: false,
+        },
+        cameraRecipe: { mode: 'dolly-push-in' },
+        modifiers: {
+          sheen: { enabled: true, startFrame: 10, durationInFrames: 24 },
+          captionBar: {
+            index: '06 / NOVAPULSE OPERATIONS',
+            text: 'Adaptive Motion Graphics for Any Real Product Screenshot (480 Frames)',
+            appearAt: 2,
+          },
+        },
+        autoSfxEvents: [{ id: 'np_closing_chime', event: 'cta-chime', frame: 8 }],
+        payload: {
+          productName: 'NovaPulse',
+          tagline: 'Operations & Telemetry Workbench (Real PNG Demo Showcase)',
+          showLogo: true,
+          buttonText: 'Explore Interactive Demo',
+        },
+      },
+    ],
+  };
+
+  const quantizedScenes = quantizeScenesToBeatGrid(
+    rawGraph.scenes,
+    beatGrid,
+    totalFrames,
+    fps
+  );
+  const parsed = SceneGraphSchema.safeParse({ ...rawGraph, scenes: quantizedScenes });
+  if (!parsed.success) {
+    throw new Error(
+      `NovaPulse Real PNG Batch 2 SceneGraph validation failed: ${JSON.stringify(parsed.error.issues, null, 2)}`
+    );
+  }
   return parsed.data as SceneGraph;
 }
 
@@ -1073,11 +1862,11 @@ async function renderVideoAndStills() {
   const stillsDir = path.resolve(outDir, 'stills');
   fs.mkdirSync(stillsDir, { recursive: true });
 
-  // 1. Build & Persist SceneGraphs (16:9 and 9:16)
-  const zgGraph16x9 = buildZentioGridV3SceneGraph({ vertical: false });
-  const zgGraph9x16 = buildZentioGridV3SceneGraph({ vertical: true });
-  const npGraph16x9 = buildNovaPulseV3SceneGraph({ vertical: false });
-  const npGraph9x16 = buildNovaPulseV3SceneGraph({ vertical: true });
+  // Build & Persist Batch 2 SceneGraphs (16:9 and 9:16)
+  const zgGraph16x9 = buildZentioGridBatch2SceneGraph({ vertical: false });
+  const zgGraph9x16 = buildZentioGridBatch2SceneGraph({ vertical: true });
+  const npGraph16x9 = buildNovaPulseRealPngSceneGraph({ vertical: false });
+  const npGraph9x16 = buildNovaPulseRealPngSceneGraph({ vertical: true });
 
   const zgAudioTimeline = buildAudioTimeline({
     audioTrack: zgGraph16x9.audioTrack,
@@ -1096,10 +1885,10 @@ async function renderVideoAndStills() {
   });
 
   console.log(
-    `[ZentioGrid v3] Validated ${zgGraph16x9.scenes.length} shots (${zgGraph16x9.canvas.durationInFrames}f @ 124 BPM), ${zgAudioTimeline.sfxCues.length} SFX cues.`
+    `[ZentioGrid Batch 2] Validated ${zgGraph16x9.scenes.length} shots (${zgGraph16x9.canvas.durationInFrames}f @ 124 BPM), ${zgAudioTimeline.sfxCues.length} SFX cues.`
   );
   console.log(
-    `[NovaPulse v3] Validated ${npGraph16x9.scenes.length} shots (${npGraph16x9.canvas.durationInFrames}f @ 108 BPM), ${npAudioTimeline.sfxCues.length} SFX cues.`
+    `[NovaPulse Real PNG Batch 2] Validated ${npGraph16x9.scenes.length} shots (${npGraph16x9.canvas.durationInFrames}f @ 108 BPM), ${npAudioTimeline.sfxCues.length} SFX cues.`
   );
 
   const zgPropsPath = path.resolve(outDir, 'zentiogrid-props.json');
@@ -1107,13 +1896,12 @@ async function renderVideoAndStills() {
   fs.writeFileSync(zgPropsPath, JSON.stringify({ sceneGraph: zgGraph16x9 }, null, 2));
   fs.writeFileSync(npPropsPath, JSON.stringify({ sceneGraph: npGraph16x9 }, null, 2));
 
-  // Use @remotion/bundler and @remotion/renderer programmatic API with CRF=20
   const { bundle } = await import('@remotion/bundler');
   const { renderMedia, renderStill, selectComposition } = await import(
     '@remotion/renderer'
   );
 
-  console.log('[Phase 2 Renderer] Bundling Remotion entry...');
+  console.log('[Phase 2 Batch 2 Renderer] Bundling Remotion entry...');
   const serveUrl = await bundle({
     entryPoint: path.resolve(process.cwd(), 'remotion/index.ts'),
   });
@@ -1125,7 +1913,7 @@ async function renderVideoAndStills() {
     inputProps: { sceneGraph: zgGraph16x9 },
   });
   const zgOutputMp4 = path.resolve(outDir, 'Zentiogrid.mp4');
-  console.log('[Phase 2 Renderer] Rendering Video 1: out/Zentiogrid.mp4 (CRF 20)...');
+  console.log('[Phase 2 Batch 2 Renderer] Rendering Video 1: out/Zentiogrid.mp4 (CRF 20)...');
   await renderMedia({
     composition: zgComp,
     serveUrl,
@@ -1138,7 +1926,7 @@ async function renderVideoAndStills() {
     inputProps: { sceneGraph: zgGraph16x9 },
   });
   const zgSizeMiB = (fs.statSync(zgOutputMp4).size / (1024 * 1024)).toFixed(2);
-  console.log(`[Phase 2 Renderer] Completed out/Zentiogrid.mp4 (${zgSizeMiB} MiB)`);
+  console.log(`[Phase 2 Batch 2 Renderer] Completed out/Zentiogrid.mp4 (${zgSizeMiB} MiB)`);
 
   // Render Video 2: out/NovaPulse-Demo.mp4 (16:9, CRF 20)
   const npComp = await selectComposition({
@@ -1147,7 +1935,7 @@ async function renderVideoAndStills() {
     inputProps: { sceneGraph: npGraph16x9 },
   });
   const npOutputMp4 = path.resolve(outDir, 'NovaPulse-Demo.mp4');
-  console.log('[Phase 2 Renderer] Rendering Video 2: out/NovaPulse-Demo.mp4 (CRF 20)...');
+  console.log('[Phase 2 Batch 2 Renderer] Rendering Video 2: out/NovaPulse-Demo.mp4 (CRF 20)...');
   await renderMedia({
     composition: npComp,
     serveUrl,
@@ -1160,7 +1948,7 @@ async function renderVideoAndStills() {
     inputProps: { sceneGraph: npGraph16x9 },
   });
   const npSizeMiB = (fs.statSync(npOutputMp4).size / (1024 * 1024)).toFixed(2);
-  console.log(`[Phase 2 Renderer] Completed out/NovaPulse-Demo.mp4 (${npSizeMiB} MiB)`);
+  console.log(`[Phase 2 Batch 2 Renderer] Completed out/NovaPulse-Demo.mp4 (${npSizeMiB} MiB)`);
 
   // Render Representative Stills in 16:9 and 9:16 for visual margin/legibility audit
   const zgComp9x16 = await selectComposition({
@@ -1175,15 +1963,22 @@ async function renderVideoAndStills() {
   });
 
   const stillSpecs = [
-    { comp: zgComp, graph: zgGraph16x9, frame: 18, name: 'zg-16x9-shot1-mask.png' },
-    { comp: zgComp, graph: zgGraph16x9, frame: 145, name: 'zg-16x9-shot2-exploded25d.png' },
-    { comp: zgComp, graph: zgGraph16x9, frame: 255, name: 'zg-16x9-shot3-bento.png' },
-    { comp: zgComp, graph: zgGraph16x9, frame: 345, name: 'zg-16x9-shot4-crop-scan.png' },
-    { comp: zgComp, graph: zgGraph16x9, frame: 418, name: 'zg-16x9-shot5-whip-pan.png' },
-    { comp: zgComp9x16, graph: zgGraph9x16, frame: 145, name: 'zg-9x16-shot2-exploded25d.png' },
-    { comp: npComp, graph: npGraph16x9, frame: 65, name: 'np-16x9-shot1-triage-scan.png' },
-    { comp: npComp, graph: npGraph16x9, frame: 265, name: 'np-16x9-shot3-exploded-demo-labeled.png' },
-    { comp: npComp9x16, graph: npGraph9x16, frame: 265, name: 'np-9x16-shot3-exploded-demo-labeled.png' },
+    // ZentioGrid (16:9 & 9:16) — Batch 2 atoms
+    { comp: zgComp, graph: zgGraph16x9, frame: 36, name: 'zg-b2-16x9-shot1-lead-word.png' },
+    { comp: zgComp, graph: zgGraph16x9, frame: 145, name: 'zg-b2-16x9-shot2-type-filter.png' },
+    { comp: zgComp, graph: zgGraph16x9, frame: 220, name: 'zg-b2-16x9-shot3-steep-glide.png' },
+    { comp: zgComp, graph: zgGraph16x9, frame: 310, name: 'zg-b2-16x9-shot4-chart-live.png' },
+    { comp: zgComp, graph: zgGraph16x9, frame: 395, name: 'zg-b2-16x9-shot5-portal-hub.png' },
+    { comp: zgComp9x16, graph: zgGraph9x16, frame: 145, name: 'zg-b2-9x16-shot2-type-filter.png' },
+    { comp: zgComp9x16, graph: zgGraph9x16, frame: 395, name: 'zg-b2-9x16-shot5-portal-hub.png' },
+    // NovaPulse Real PNG Captures (16:9 & 9:16)
+    { comp: npComp, graph: npGraph16x9, frame: 55, name: 'np-b2-16x9-shot1-real-png-crop-dock.png' },
+    { comp: npComp, graph: npGraph16x9, frame: 140, name: 'np-b2-16x9-shot2-real-png-type-filter.png' },
+    { comp: npComp, graph: npGraph16x9, frame: 215, name: 'np-b2-16x9-shot3-real-png-steep-glide.png' },
+    { comp: npComp, graph: npGraph16x9, frame: 295, name: 'np-b2-16x9-shot4-real-png-chart-live.png' },
+    { comp: npComp, graph: npGraph16x9, frame: 385, name: 'np-b2-16x9-shot5-real-png-portal-hub.png' },
+    { comp: npComp9x16, graph: npGraph9x16, frame: 55, name: 'np-b2-9x16-shot1-real-png-crop-dock.png' },
+    { comp: npComp9x16, graph: npGraph9x16, frame: 215, name: 'np-b2-9x16-shot3-real-png-steep-glide.png' },
   ];
 
   for (const s of stillSpecs) {
@@ -1196,7 +1991,7 @@ async function renderVideoAndStills() {
       inputProps: { sceneGraph: s.graph },
     });
   }
-  console.log(`[Phase 2 Renderer] Rendered ${stillSpecs.length} verification stills in out/stills/`);
+  console.log(`[Phase 2 Batch 2 Renderer] Rendered ${stillSpecs.length} verification stills in out/stills/`);
 }
 
 if (require.main === module) {

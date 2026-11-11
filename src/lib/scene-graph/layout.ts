@@ -88,6 +88,11 @@ export const SCENE_LAYOUT_PRESETS: Record<SceneNode['type'], LayoutPresetId> = {
   bento_cascade: 'bento',
   crop_callout: 'stage',
   whip_pan: 'stage',
+  lead_word_assemble: 'hook',
+  chart_live_moves: 'stage',
+  type_and_filter: 'stage',
+  steep_tilt_glide: 'stage',
+  portal_zoom_hub: 'stage',
 };
 
 /**
